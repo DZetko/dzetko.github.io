@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>.NET Aspire — Presentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg-0: #07060f;
+    --bg-1: #0d0a1f;
+    --accent-purple: #8b5cf6;
+    --accent-violet: #a855f7;
+    --accent-blue: #3b82f6;
+    --accent-cyan: #06b6d4;
+    --accent-pink: #ec4899;
+    --text-100: #ffffff;
+    --text-200: rgba(255, 255, 255, 0.86);
+    --text-300: rgba(255, 255, 255, 0.62);
+    --text-400: rgba(255, 255, 255, 0.42);
+    --glass-bg: rgba(255, 255, 255, 0.06);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-strong-bg: rgba(255, 255, 255, 0.09);
+    --easing: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-0);
+    color: var(--text-100);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* === Animated mesh background === */
+  .bg-mesh {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at top, #1a0f3a 0%, transparent 50%),
+      radial-gradient(ellipse at bottom, #0a0820 0%, transparent 60%),
+      var(--bg-0);
+  }
+
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.55;
+    will-change: transform;
+  }
+  .blob.b1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, var(--accent-purple), transparent 70%);
+    top: -150px; left: -100px;
+    animation: float1 22s var(--easing) infinite;
+  }
+  .blob.b2 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, var(--accent-blue), transparent 70%);
+    bottom: -100px; right: -80px;
+    animation: float2 26s var(--easing) infinite;
+  }
+  .blob.b3 {
+    width: 420px; height: 420px;
+    background: radial-gradient(circle, var(--accent-pink), transparent 70%);
+    top: 40%; left: 50%;
+    animation: float3 30s var(--easing) infinite;
+    opacity: 0.35;
+  }
+  .blob.b4 {
+    width: 380px; height: 380px;
+    background: radial-gradient(circle, var(--accent-cyan), transparent 70%);
+    top: 60%; left: 10%;
+    animation: float4 28s var(--easing) infinite;
+    opacity: 0.3;
+  }
+
+  @keyframes float1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(200px, 100px) scale(1.15); }
+    66% { transform: translate(80px, 220px) scale(0.95); }
+  }
+  @keyframes float2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-180px, -140px) scale(1.2); }
+  }
+  @keyframes float3 {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-30%, -60%) scale(1.3); }
+  }
+  @keyframes float4 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(150px, -100px) scale(0.85); }
+  }
+
+  /* Subtle noise/grain overlay */
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.7'/></svg>");
+  }
+
+  /* === Stage === */
+  .stage {
+    position: relative;
+    z-index: 2;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 80px 140px;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 8vw 140px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(40px) scale(0.985);
+    transition:
+      opacity 0.7s var(--easing),
+      transform 0.85s var(--easing),
+      visibility 0.7s var(--easing);
+  }
+  .slide.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+  }
+  .slide.exiting {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.99);
+  }
+
+  /* Stagger children on active slide */
+  .slide .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s var(--easing), transform 0.8s var(--easing);
+  }
+  .slide.active .reveal {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .slide.active .reveal:nth-child(1) { transition-delay: 0.15s; }
+  .slide.active .reveal:nth-child(2) { transition-delay: 0.28s; }
+  .slide.active .reveal:nth-child(3) { transition-delay: 0.41s; }
+  .slide.active .reveal:nth-child(4) { transition-delay: 0.54s; }
+  .slide.active .reveal:nth-child(5) { transition-delay: 0.67s; }
+
+  /* === Typography === */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-200);
+  }
+  .eyebrow .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent-violet);
+    box-shadow: 0 0 10px var(--accent-violet);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.7; }
+  }
+
+  h1.hero {
+    font-size: clamp(56px, 9vw, 144px);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    background: linear-gradient(135deg, #ffffff 0%, #c4b5fd 35%, #818cf8 70%, #60a5fa 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 24px 0;
+    text-align: center;
+  }
+
+  h2.section {
+    font-size: clamp(40px, 5.5vw, 76px);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    margin-bottom: 36px;
+    background: linear-gradient(135deg, #ffffff 0%, #e9d5ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+  }
+
+  .accent {
+    background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle {
+    font-size: clamp(18px, 1.6vw, 22px);
+    color: var(--text-300);
+    font-weight: 400;
+    line-height: 1.5;
+    max-width: 720px;
+    text-align: center;
+  }
+
+  /* === Glass cards === */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  /* === Slide 1: Title === */
+  .title-tagline {
+    margin-top: 32px;
+    font-size: clamp(18px, 2vw, 26px);
+    font-weight: 400;
+    color: var(--text-300);
+    text-align: center;
+    max-width: 760px;
+  }
+  .title-badges {
+    margin-top: 48px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .badge {
+    padding: 10px 20px;
+    border-radius: 100px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-200);
+  }
+
+  /* === Slide 2: What & When === */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    width: 100%;
+    max-width: 1100px;
+  }
+  .info-card {
+    padding: 36px;
+    border-radius: 24px;
+  }
+  .info-card .label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-violet);
+    margin-bottom: 16px;
+  }
+  .info-card h3 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+  }
+  .info-card p {
+    color: var(--text-300);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  .timeline {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .timeline-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    color: var(--text-200);
+    font-size: 15px;
+  }
+  .timeline-date {
+    flex: 0 0 auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent-cyan);
+    padding: 4px 10px;
+    background: rgba(6, 182, 212, 0.1);
+    border: 1px solid rgba(6, 182, 212, 0.25);
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  /* === Slide 3: Why === */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+  }
+  .feature {
+    padding: 24px;
+    border-radius: 20px;
+    transition: transform 0.4s var(--easing), background 0.4s var(--easing);
+  }
+  .feature:hover {
+    transform: translateY(-6px);
+    background: var(--glass-strong-bg);
+  }
+  .feature .icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(59, 130, 246, 0.18));
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    font-size: 20px;
+  }
+  .feature h4 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .feature p {
+    color: var(--text-300);
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+
+  /* === Slide 4: Use cases === */
+  .usecases {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 1100px;
+  }
+  .usecase {
+    display: flex;
+    gap: 20px;
+    padding: 28px;
+    border-radius: 20px;
+    align-items: flex-start;
+    transition: transform 0.4s var(--easing);
+  }
+  .usecase:hover { transform: translateX(6px); }
+  .usecase-num {
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent-violet), var(--accent-blue));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.35);
+  }
+  .usecase-body h4 {
+    font-size: 19px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .usecase-body p {
+    color: var(--text-300);
+    font-size: 14.5px;
+    line-height: 1.55;
+  }
+
+  /* === Slide: Run anything (code + methods) === */
+  .run-wrap {
+    width: 100%;
+    max-width: 1200px;
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+  .code-block {
+    padding: 28px 30px;
+    border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.85;
+    overflow-x: auto;
+    position: relative;
+  }
+  .code-block::before {
+    content: 'Program.cs';
+    position: absolute;
+    top: 10px;
+    right: 16px;
+    font-size: 11px;
+    color: var(--text-400);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .code-block .k { color: #c084fc; }      /* keyword */
+  .code-block .t { color: #60a5fa; }      /* type */
+  .code-block .m { color: #5eead4; }      /* method */
+  .code-block .s { color: #fbbf24; }      /* string */
+  .code-block .c { color: var(--text-400); font-style: italic; }
+  .code-block .p { color: var(--text-200); }
+
+  .method-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .method {
+    padding: 14px 18px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: transform 0.3s var(--easing), background 0.3s var(--easing);
+  }
+  .method:hover {
+    transform: translateX(4px);
+    background: var(--glass-strong-bg);
+  }
+  .method .m-sig {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    color: #5eead4;
+    flex: 0 0 auto;
+    background: rgba(94, 234, 212, 0.08);
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(94, 234, 212, 0.2);
+  }
+  .method .m-desc {
+    font-size: 13.5px;
+    color: var(--text-300);
+    line-height: 1.4;
+  }
+
+  /* === Slide: AppHost & ServiceDefaults === */
+  .project-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    width: 100%;
+    max-width: 1150px;
+  }
+  .project-card {
+    padding: 30px;
+    border-radius: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .project-card .pc-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .project-card .pc-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(59, 130, 246, 0.2));
+    border: 1px solid rgba(139, 92, 246, 0.35);
+    font-size: 22px;
+    flex: 0 0 auto;
+  }
+  .project-card .pc-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-100);
+    letter-spacing: -0.01em;
+  }
+  .project-card .pc-role {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-cyan);
+    margin-top: 2px;
+  }
+  .project-card p.pc-desc {
+    font-size: 14.5px;
+    color: var(--text-300);
+    line-height: 1.55;
+  }
+  .project-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .project-card li {
+    font-size: 13.5px;
+    color: var(--text-200);
+    line-height: 1.45;
+    padding-left: 18px;
+    position: relative;
+  }
+  .project-card li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan));
+  }
+  .pc-snippet {
+    margin-top: auto;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--text-200);
+    line-height: 1.5;
+    overflow-x: auto;
+  }
+  .pc-snippet .k { color: #c084fc; }
+  .pc-snippet .m { color: #5eead4; }
+  .pc-snippet .s { color: #fbbf24; }
+  .pc-snippet .c { color: var(--text-400); font-style: italic; }
+
+  /* === Slide: Configuration === */
+  .config-wrap {
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .config-precedence {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px;
+    border-radius: 18px;
+  }
+  .prec-header {
+    display: grid;
+    grid-template-columns: 50px 1fr 1.2fr 80px;
+    gap: 14px;
+    padding: 6px 14px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-400);
+  }
+  .prec-row {
+    display: grid;
+    grid-template-columns: 50px 1fr 1.2fr 80px;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: all 0.3s var(--easing);
+  }
+  .prec-row.winner {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.18), rgba(94, 234, 212, 0.12));
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.18);
+  }
+  .prec-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-300);
+  }
+  .prec-row.winner .prec-num {
+    background: linear-gradient(135deg, var(--accent-violet), var(--accent-blue));
+    color: var(--text-100);
+  }
+  .prec-source {
+    font-size: 14px;
+    color: var(--text-100);
+    font-weight: 500;
+  }
+  .prec-source small {
+    display: block;
+    font-size: 11px;
+    color: var(--text-400);
+    font-weight: 400;
+    margin-top: 2px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .prec-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: #fbbf24;
+  }
+  .prec-row.winner .prec-value {
+    color: #5eead4;
+    font-weight: 600;
+  }
+  .prec-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-400);
+    text-align: right;
+  }
+  .prec-row.winner .prec-tag {
+    color: var(--accent-cyan);
+  }
+  .config-result {
+    padding: 16px 22px;
+    border-radius: 14px;
+    background: rgba(94, 234, 212, 0.08);
+    border: 1px solid rgba(94, 234, 212, 0.25);
+    font-size: 14px;
+    color: var(--text-100);
+    text-align: center;
+  }
+  .config-result strong {
+    color: #5eead4;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* === Slide 5: Integrations === */
+  .integrations {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    width: 100%;
+    max-width: 1200px;
+  }
+  .integration {
+    padding: 24px 16px;
+    border-radius: 18px;
+    text-align: center;
+    transition: transform 0.4s var(--easing), background 0.4s var(--easing);
+    cursor: default;
+  }
+  .integration:hover {
+    transform: translateY(-8px) scale(1.04);
+    background: var(--glass-strong-bg);
+  }
+  .integration .ig-icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .integration .ig-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-200);
+  }
+  .integration .ig-type {
+    font-size: 11px;
+    color: var(--text-400);
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .db-row {
+    margin-top: 28px;
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 16px 22px;
+    border-radius: 18px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    flex-wrap: wrap;
+  }
+  .db-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-violet);
+    flex: 0 0 auto;
+  }
+  .db-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    flex: 1;
+  }
+  .db-pill {
+    padding: 6px 14px;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-200);
+    font-family: 'JetBrains Mono', monospace;
+    transition: all 0.3s var(--easing);
+  }
+  .db-pill:hover {
+    background: rgba(139, 92, 246, 0.15);
+    border-color: rgba(139, 92, 246, 0.4);
+    color: var(--text-100);
+  }
+
+  .docs-link {
+    margin-top: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    border-radius: 100px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    color: var(--text-100);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    transition: all 0.3s var(--easing);
+  }
+  .docs-link:hover {
+    background: rgba(139, 92, 246, 0.18);
+    border-color: rgba(139, 92, 246, 0.45);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.25);
+  }
+  .docs-link svg {
+    transition: transform 0.3s var(--easing);
+  }
+  .docs-link:hover svg {
+    transform: translate(2px, -2px);
+  }
+
+  /* === Slide 6: Demo Coming === */
+  .demo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+  }
+  .demo-orb {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(168, 85, 247, 0.6), rgba(59, 130, 246, 0.4) 60%, transparent 80%);
+    box-shadow:
+      0 0 80px rgba(168, 85, 247, 0.5),
+      inset 0 0 60px rgba(255, 255, 255, 0.08);
+    animation: orbPulse 3.5s ease-in-out infinite;
+  }
+  .demo-orb::before {
+    content: '';
+    position: absolute;
+    inset: -20px;
+    border-radius: 50%;
+    border: 2px solid rgba(168, 85, 247, 0.3);
+    animation: orbRing 3.5s ease-out infinite;
+  }
+  .demo-orb::after {
+    content: '';
+    position: absolute;
+    inset: -40px;
+    border-radius: 50%;
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    animation: orbRing 3.5s ease-out 0.6s infinite;
+  }
+  @keyframes orbPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+  }
+  @keyframes orbRing {
+    0% { transform: scale(0.9); opacity: 1; }
+    100% { transform: scale(1.4); opacity: 0; }
+  }
+
+  h1.demo-title {
+    font-size: clamp(56px, 9vw, 132px);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    background: linear-gradient(135deg, #ffffff 0%, #d8b4fe 40%, #a78bfa 70%, #60a5fa 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+  }
+
+  .demo-sub {
+    font-size: clamp(18px, 1.8vw, 24px);
+    color: var(--text-300);
+    text-align: center;
+    max-width: 600px;
+  }
+
+  /* === Controls === */
+  .controls {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 14px;
+    border-radius: 100px;
+    background: rgba(15, 12, 30, 0.55);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .nav-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-100);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s var(--easing);
+    font-size: 18px;
+  }
+  .nav-btn:hover {
+    background: rgba(139, 92, 246, 0.25);
+    border-color: rgba(139, 92, 246, 0.5);
+    transform: scale(1.08);
+  }
+  .nav-btn:active { transform: scale(0.96); }
+
+  .dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 0 8px;
+  }
+  .dot-nav {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.3s var(--easing);
+  }
+  .dot-nav:hover { background: rgba(255, 255, 255, 0.4); }
+  .dot-nav.active {
+    width: 28px;
+    border-radius: 100px;
+    background: linear-gradient(90deg, var(--accent-violet), var(--accent-blue));
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.6);
+  }
+
+  .counter {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--text-300);
+    padding: 0 10px;
+    min-width: 50px;
+    text-align: center;
+  }
+
+  /* === Slide number indicator (top right) === */
+  .top-bar {
+    position: fixed;
+    top: 28px;
+    left: 28px;
+    right: 28px;
+    z-index: 50;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+  }
+  .brand {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-300);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-mark {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, var(--accent-violet), var(--accent-blue));
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+  }
+  .hint {
+    font-size: 12px;
+    color: var(--text-400);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .hint kbd {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    padding: 2px 8px;
+    margin: 0 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+
+  /* Progress bar at top */
+  .progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.05);
+    z-index: 60;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-violet), var(--accent-cyan));
+    transition: width 0.6s var(--easing);
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.6);
+  }
+
+  @media (max-width: 1100px) {
+    .features-grid { grid-template-columns: repeat(2, 1fr); }
+    .run-wrap { grid-template-columns: 1fr; }
+    .project-pair { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 900px) {
+    .grid-2, .usecases { grid-template-columns: 1fr; }
+    .features-grid { grid-template-columns: 1fr; }
+    .integrations { grid-template-columns: repeat(2, 1fr); }
+    .top-bar { padding: 0; }
+    .hint { display: none; }
+    .code-block { font-size: 12px; }
+    .prec-header, .prec-row { grid-template-columns: 40px 1fr; gap: 8px; }
+    .prec-header span:nth-child(3), .prec-header span:nth-child(4),
+    .prec-row .prec-value, .prec-row .prec-tag { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-mesh">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div class="blob b4"></div>
+</div>
+<div class="grain"></div>
+
+<div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="top-bar">
+  <div class="brand">
+    <div class="brand-mark"></div>
+    <span>.NET Aspire</span>
+  </div>
+  <div class="hint">
+    Use <kbd>←</kbd> <kbd>→</kbd> or <kbd>space</kbd>
+  </div>
+</div>
+
+<div class="stage" id="stage">
+
+  <!-- Slide 1: Title -->
+  <section class="slide active" data-slide="0">
+    <span class="eyebrow reveal"><span class="dot"></span>Cloud-Native, Reimagined</span>
+    <h1 class="hero reveal">.NET Aspire</h1>
+    <p class="title-tagline reveal">The developer's control plane for running, debugging, and shipping <span class="accent">complex multi-service apps</span> — locally and in the cloud.</p>
+    <div class="title-badges reveal">
+      <span class="badge">Microsoft</span>
+      <span class="badge">Open Source</span>
+      <span class="badge">Cloud-Native</span>
+      <span class="badge">.NET 8 / 9 / 10</span>
+    </div>
+  </section>
+
+  <!-- Slide 2: What & When -->
+  <section class="slide" data-slide="1">
+    <h2 class="section reveal">What & <span class="accent">When</span></h2>
+    <div class="grid-2">
+      <div class="info-card glass reveal">
+        <div class="label">What it is</div>
+        <h3>A dev-time orchestrator</h3>
+        <p>An opinionated dev stack from Microsoft that runs your entire distributed application — APIs, frontends, databases, queues, workers — from a single C# entry point. Aspire turns sprawling multi-project repos into something you can <strong style="color:var(--text-100);">F5 and debug</strong>, then ship to the cloud unchanged.</p>
+      </div>
+      <div class="info-card glass reveal">
+        <div class="label">Timeline</div>
+        <h3>From preview to GA</h3>
+        <div class="timeline">
+          <div class="timeline-row"><span class="timeline-date">Nov 2023</span><span>Announced at .NET Conf alongside .NET 8</span></div>
+          <div class="timeline-row"><span class="timeline-date">May 2024</span><span>First stable release — Aspire 8.0</span></div>
+          <div class="timeline-row"><span class="timeline-date">Nov 2024</span><span>Aspire 9 ships with .NET 9 — polyglot support</span></div>
+          <div class="timeline-row"><span class="timeline-date">2025+</span><span>Maturing ecosystem, deeper Azure & K8s integration</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 3: Why it's good -->
+  <section class="slide" data-slide="2">
+    <h2 class="section reveal">Why it's <span class="accent">good</span></h2>
+    <div class="features-grid reveal">
+      <div class="feature glass">
+        <div class="icon">🎼</div>
+        <h4>One-command Orchestration</h4>
+        <p>Replace 200-line <code style="font-family:'JetBrains Mono',monospace;font-size:0.9em;">docker-compose.yml</code> files and a forest of terminal tabs. Hit <strong style="color:var(--text-100);">F5</strong> and Aspire boots every API, frontend, database, queue, and worker in the right order — with dependencies resolved automatically and shutdown handled cleanly.</p>
+      </div>
+      <div class="feature glass">
+        <div class="icon">📊</div>
+        <h4>Observability, Free</h4>
+        <p>Stop guessing why a request is slow. Every service emits <strong style="color:var(--text-100);">structured logs, metrics, and distributed traces</strong> via OpenTelemetry — zero SDK setup. Watch traces flow across services in real time as you code, with no agent to install.</p>
+      </div>
+      <div class="feature glass">
+        <div class="icon">🔍</div>
+        <h4>Type-safe Service Discovery</h4>
+        <p>Reference a service by name in C# — Aspire injects the URL, connection string, or secret at runtime. Rename a backend and the <strong style="color:var(--text-100);">compiler catches every consumer</strong>. No more stale <code style="font-family:'JetBrains Mono',monospace;font-size:0.9em;">appsettings.json</code> hunts on Monday morning.</p>
+      </div>
+      <div class="feature glass">
+        <div class="icon">📡</div>
+        <h4>Built-in Dev Dashboard</h4>
+        <p>A real-time UI showing <strong style="color:var(--text-100);">every resource, log line, env var, metric, and trace span</strong> across your whole stack. Click a slow request, jump to the offending service. No Kibana, no Grafana, no setup — it's just there at <code style="font-family:'JetBrains Mono',monospace;font-size:0.9em;">localhost</code>.</p>
+      </div>
+      <div class="feature glass">
+        <div class="icon">🚀</div>
+        <h4>Dev → Prod, Same Manifest</h4>
+        <p>From the same C# topology, Aspire generates deployment artifacts for <strong style="color:var(--text-100);">Azure Container Apps, Kubernetes (Helm), and Docker Compose</strong>. Dev parity becomes prod parity — no parallel YAML to keep in sync.</p>
+      </div>
+      <div class="feature glass">
+        <div class="icon">🧩</div>
+        <h4>Polyglot by Design</h4>
+        <p>Real projects rarely speak one language. Aspire treats <strong style="color:var(--text-100);">Node, Python, Go, Java — and your Vite frontend</strong> — as first-class citizens, sharing telemetry, env vars, and service discovery with your .NET services. One dev loop for the whole stack.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 4: Use cases -->
+  <section class="slide" data-slide="3">
+    <h2 class="section reveal">Use <span class="accent">cases</span></h2>
+    <div class="usecases">
+      <div class="usecase glass reveal">
+        <div class="usecase-num">01</div>
+        <div class="usecase-body">
+          <h4>Complex Multi-Service Apps</h4>
+          <p>Frontend + API + workers + queues + cache + database. Aspire wires them all together from one C# file — no bash glue, no parallel terminals.</p>
+        </div>
+      </div>
+      <div class="usecase glass reveal">
+        <div class="usecase-num">02</div>
+        <div class="usecase-body">
+          <h4>Local Dev Environments</h4>
+          <p>Replace your <code style="font-family:'JetBrains Mono',monospace;font-size:0.9em;">docker-compose.yml</code> and bespoke startup scripts. F5 starts everything, with logs and traces visible in one dashboard.</p>
+        </div>
+      </div>
+      <div class="usecase glass reveal">
+        <div class="usecase-num">03</div>
+        <div class="usecase-body">
+          <h4>Onboarding &amp; Dev / Prod Parity</h4>
+          <p>New hire on day one? <code style="font-family:'JetBrains Mono',monospace;font-size:0.9em;">git clone</code>, F5 — full stack running locally with the same Postgres, Redis, and queues that prod uses.</p>
+        </div>
+      </div>
+      <div class="usecase glass reveal">
+        <div class="usecase-num">04</div>
+        <div class="usecase-body">
+          <h4>Event-driven Systems</h4>
+          <p>HTTP APIs, queues, workers, and pub/sub topics — Aspire gives you a unified trace across every hop, so debugging async flows finally feels sane.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 5: Run anything -->
+  <section class="slide" data-slide="4">
+    <h2 class="section reveal">Run <span class="accent">anything</span></h2>
+    <p class="subtitle reveal" style="margin-bottom:32px;">Aspire isn't .NET-only. One fluent API hosts everything in your stack — frontends, scripts, containers, binaries.</p>
+    <div class="run-wrap reveal">
+      <div class="code-block glass">
+<pre style="margin:0;"><span class="k">var</span> <span class="p">builder</span> = <span class="t">DistributedApplication</span>.<span class="m">CreateBuilder</span>(args);
+
+<span class="c">// .NET projects in your solution</span>
+<span class="k">var</span> <span class="p">api</span>     = <span class="p">builder</span>.<span class="m">AddProject</span>&lt;<span class="t">Projects.Api</span>&gt;(<span class="s">"api"</span>);
+
+<span class="c">// Vite frontend (React, Vue, Svelte…)</span>
+<span class="k">var</span> <span class="p">web</span>     = <span class="p">builder</span>.<span class="m">AddViteApp</span>(<span class="s">"web"</span>, <span class="s">"../web"</span>);
+
+<span class="c">// Any npm script — Next.js, Angular, etc.</span>
+<span class="k">var</span> <span class="p">admin</span>   = <span class="p">builder</span>.<span class="m">AddNpmApp</span>(<span class="s">"admin"</span>, <span class="s">"../admin"</span>, <span class="s">"dev"</span>);
+
+<span class="c">// Python services and background workers</span>
+<span class="k">var</span> <span class="p">etl</span>     = <span class="p">builder</span>.<span class="m">AddPythonApp</span>(<span class="s">"etl"</span>, <span class="s">"../etl"</span>, <span class="s">"main.py"</span>);
+
+<span class="c">// Any container image — legacy systems included</span>
+<span class="k">var</span> <span class="p">legacy</span>  = <span class="p">builder</span>.<span class="m">AddContainer</span>(<span class="s">"legacy"</span>, <span class="s">"acme/old:v2"</span>);
+
+<span class="p">builder</span>.<span class="m">Build</span>().<span class="m">Run</span>();</pre>
+      </div>
+      <div class="method-list">
+        <div class="method glass"><span class="m-sig">AddProject&lt;T&gt;()</span><span class="m-desc">.NET projects in your solution</span></div>
+        <div class="method glass"><span class="m-sig">AddViteApp()</span><span class="m-desc">React, Vue, Svelte, SolidJS frontends</span></div>
+        <div class="method glass"><span class="m-sig">AddNpmApp()</span><span class="m-desc">Next.js, Angular — anything with npm scripts</span></div>
+        <div class="method glass"><span class="m-sig">AddNodeApp()</span><span class="m-desc">Standalone Node.js services</span></div>
+        <div class="method glass"><span class="m-sig">AddPythonApp()</span><span class="m-desc">Python APIs &amp; background workers</span></div>
+        <div class="method glass"><span class="m-sig">AddContainer()</span><span class="m-desc">Any Docker image from any registry</span></div>
+        <div class="method glass"><span class="m-sig">AddDockerfile()</span><span class="m-desc">Build &amp; run a local Dockerfile</span></div>
+        <div class="method glass"><span class="m-sig">AddExecutable()</span><span class="m-desc">Any binary on disk — Go, Rust, anything</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 6: AppHost & ServiceDefaults -->
+  <section class="slide" data-slide="5">
+    <h2 class="section reveal">Two projects, <span class="accent">one stack</span></h2>
+    <p class="subtitle reveal" style="margin-bottom:32px;">Every Aspire solution has a clean split — orchestration lives in one project, shared cross-cutting concerns in another.</p>
+    <div class="project-pair reveal">
+      <div class="project-card glass">
+        <div class="pc-head">
+          <div class="pc-icon">🎯</div>
+          <div>
+            <div class="pc-title">AppHost</div>
+            <div class="pc-role">Dev-time orchestrator</div>
+          </div>
+        </div>
+        <p class="pc-desc">The entry point that describes your topology in C# — which services run, which databases they need, how they connect. Runs only during development and deployment.</p>
+        <ul>
+          <li>Declares every resource: projects, containers, frontends</li>
+          <li>Wires connection strings &amp; env vars between them</li>
+          <li>Hosts the dev dashboard &amp; resource explorer</li>
+          <li>Generates manifests for Azure / K8s / Compose</li>
+          <li>Never ships to production — it's a build-time tool</li>
+        </ul>
+<pre class="pc-snippet"><span class="c">// AppHost/Program.cs</span>
+<span class="k">var</span> db  = builder.<span class="m">AddPostgres</span>(<span class="s">"db"</span>);
+<span class="k">var</span> api = builder.<span class="m">AddProject</span>&lt;Projects.Api&gt;(<span class="s">"api"</span>)
+                 .<span class="m">WithReference</span>(db);</pre>
+      </div>
+      <div class="project-card glass">
+        <div class="pc-head">
+          <div class="pc-icon">🧰</div>
+          <div>
+            <div class="pc-title">ServiceDefaults</div>
+            <div class="pc-role">Shared runtime kit</div>
+          </div>
+        </div>
+        <p class="pc-desc">A small class library that every service references. One call wires up the cross-cutting plumbing that all services need — and keeps it consistent.</p>
+        <ul>
+          <li>OpenTelemetry — logs, metrics, traces</li>
+          <li>Standard health check endpoints (<code style="font-family:'JetBrains Mono',monospace;font-size:0.95em;">/health</code>, <code style="font-family:'JetBrains Mono',monospace;font-size:0.95em;">/alive</code>)</li>
+          <li>Service discovery client wiring</li>
+          <li>Resilience &amp; retry policies (Polly)</li>
+          <li>Ships with your services to production</li>
+        </ul>
+<pre class="pc-snippet"><span class="c">// In each service's Program.cs</span>
+<span class="k">var</span> builder = WebApplication.<span class="m">CreateBuilder</span>(args);
+builder.<span class="m">AddServiceDefaults</span>(); <span class="c">// done.</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 7: Configuration -->
+  <section class="slide" data-slide="6">
+    <h2 class="section reveal">Configuration &amp; <span class="accent">precedence</span></h2>
+    <p class="subtitle reveal" style="margin-bottom:24px;">Both the AppHost and your services have their own <code style="font-family:'JetBrains Mono',monospace;font-size:0.9em;">appsettings.json</code> and user-secrets. Last source wins.</p>
+    <div class="config-wrap reveal">
+      <div class="config-precedence glass">
+        <div class="prec-header">
+          <span></span><span>Source</span><span>Resolved value</span><span style="text-align:right;">Scope</span>
+        </div>
+        <div class="prec-row">
+          <span class="prec-num">1</span>
+          <span class="prec-source">appsettings.json<small>Service defaults — shipped with the app</small></span>
+          <span class="prec-value">"ApiKey": "default-key"</span>
+          <span class="prec-tag">Service</span>
+        </div>
+        <div class="prec-row">
+          <span class="prec-num">2</span>
+          <span class="prec-source">appsettings.Development.json<small>Per-environment overrides</small></span>
+          <span class="prec-value">"ApiKey": "dev-key"</span>
+          <span class="prec-tag">Service</span>
+        </div>
+        <div class="prec-row">
+          <span class="prec-num">3</span>
+          <span class="prec-source">User Secrets (service)<small>Local dev only — never checked in</small></span>
+          <span class="prec-value">"ApiKey": "local-secret"</span>
+          <span class="prec-tag">Service</span>
+        </div>
+        <div class="prec-row">
+          <span class="prec-num">4</span>
+          <span class="prec-source">AppHost <code style="font-family:'JetBrains Mono',monospace;font-size:0.95em;">appsettings.json</code> + user-secrets<small>Read by AppHost, passed to services via parameters</small></span>
+          <span class="prec-value">Parameter "api-key" → "aspire-key"</span>
+          <span class="prec-tag">AppHost</span>
+        </div>
+        <div class="prec-row winner">
+          <span class="prec-num">5</span>
+          <span class="prec-source">Environment variables (injected by AppHost)<small>via .WithEnvironment(...) — last in the chain</small></span>
+          <span class="prec-value">ApiKey=aspire-key</span>
+          <span class="prec-tag">Wins</span>
+        </div>
+      </div>
+      <div class="config-result">
+        Result: the service reads <strong>ApiKey = "aspire-key"</strong> — AppHost-injected env vars override every local file.
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 8: Integrations -->
+  <section class="slide" data-slide="7">
+    <h2 class="section reveal">Common <span class="accent">integrations</span></h2>
+    <p class="subtitle reveal" style="margin-bottom:36px;">Drop-in components — add a NuGet package, get a wired-up, observable client.</p>
+    <div class="integrations reveal">
+      <div class="integration glass"><span class="ig-icon">🐘</span><div class="ig-name">PostgreSQL</div><div class="ig-type">database</div></div>
+      <div class="integration glass"><span class="ig-icon">🔴</span><div class="ig-name">Redis</div><div class="ig-type">cache</div></div>
+      <div class="integration glass"><span class="ig-icon">🐇</span><div class="ig-name">RabbitMQ</div><div class="ig-type">messaging</div></div>
+      <div class="integration glass"><span class="ig-icon">🌊</span><div class="ig-name">Kafka</div><div class="ig-type">streaming</div></div>
+      <div class="integration glass"><span class="ig-icon">🍃</span><div class="ig-name">MongoDB</div><div class="ig-type">database</div></div>
+      <div class="integration glass"><span class="ig-icon">☁️</span><div class="ig-name">Azure Service Bus</div><div class="ig-type">messaging</div></div>
+      <div class="integration glass"><span class="ig-icon">🔐</span><div class="ig-name">Keycloak</div><div class="ig-type">auth</div></div>
+      <div class="integration glass"><span class="ig-icon">🗄️</span><div class="ig-name">SQL Server</div><div class="ig-type">database</div></div>
+      <div class="integration glass"><span class="ig-icon">🐬</span><div class="ig-name">MySQL</div><div class="ig-type">database</div></div>
+      <div class="integration glass"><span class="ig-icon">📦</span><div class="ig-name">Azure Storage</div><div class="ig-type">storage</div></div>
+    </div>
+
+    <div class="db-row reveal">
+      <span class="db-label">Database providers</span>
+      <div class="db-pills">
+        <span class="db-pill">PostgreSQL</span>
+        <span class="db-pill">SQL Server</span>
+        <span class="db-pill">MySQL</span>
+        <span class="db-pill">MariaDB</span>
+        <span class="db-pill">MongoDB</span>
+        <span class="db-pill">Oracle</span>
+        <span class="db-pill">Cosmos DB</span>
+        <span class="db-pill">SQLite</span>
+        <span class="db-pill">Elasticsearch</span>
+      </div>
+    </div>
+
+    <a class="docs-link reveal" href="https://aspire.dev/integrations/gallery/" target="_blank" rel="noopener noreferrer">
+      <span>Browse the full integrations gallery</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+    </a>
+  </section>
+
+  <!-- Slide 9: Demo Coming -->
+  <section class="slide" data-slide="8">
+    <div class="demo-container">
+      <div class="demo-orb reveal"></div>
+      <span class="eyebrow reveal"><span class="dot"></span>Hands-on next</span>
+      <h1 class="demo-title reveal">Demo coming.</h1>
+      <p class="demo-sub reveal">Let's see Aspire light up a real distributed app — services, dashboards, traces, and all.</p>
+    </div>
+  </section>
+
+</div>
+
+<!-- Controls -->
+<div class="controls">
+  <button class="nav-btn" id="prevBtn" aria-label="Previous slide">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+  </button>
+
+  <div class="dots" id="dots"></div>
+
+  <div class="counter" id="counter">1 / 6</div>
+
+  <button class="nav-btn" id="nextBtn" aria-label="Next slide">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+  </button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const counter = document.getElementById('counter');
+  const dotsContainer = document.getElementById('dots');
+  const progressFill = document.getElementById('progressFill');
+  let current = 0;
+  let animating = false;
+
+  // Build dot nav
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot-nav' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => goTo(i));
+    dotsContainer.appendChild(d);
+  }
+  const dotEls = dotsContainer.querySelectorAll('.dot-nav');
+
+  function updateUI() {
+    counter.textContent = `${current + 1} / ${total}`;
+    dotEls.forEach((d, i) => d.classList.toggle('active', i === current));
+    progressFill.style.width = `${((current + 1) / total) * 100}%`;
+  }
+
+  function goTo(index) {
+    if (animating || index === current) return;
+    if (index < 0) index = total - 1;
+    if (index >= total) index = 0;
+
+    animating = true;
+    const currentSlide = slides[current];
+    const nextSlide = slides[index];
+
+    currentSlide.classList.remove('active');
+    currentSlide.classList.add('exiting');
+
+    setTimeout(() => {
+      currentSlide.classList.remove('exiting');
+      nextSlide.classList.add('active');
+      current = index;
+      updateUI();
+      setTimeout(() => { animating = false; }, 700);
+    }, 200);
+  }
+
+  prevBtn.addEventListener('click', () => goTo(current - 1));
+  nextBtn.addEventListener('click', () => goTo(current + 1));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+      e.preventDefault();
+      goTo(current + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      e.preventDefault();
+      goTo(current - 1);
+    } else if (e.key === 'Home') {
+      goTo(0);
+    } else if (e.key === 'End') {
+      goTo(total - 1);
+    }
+  });
+
+  updateUI();
+</script>
+
+</body>
+</html>
