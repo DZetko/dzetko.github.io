@@ -488,6 +488,108 @@
     line-height: 1.4;
   }
 
+  /* === Slide: Aspire vs Docker === */
+  .vs-note {
+    width: 100%;
+    max-width: 1100px;
+    margin-bottom: 22px;
+    padding: 14px 22px;
+    border-radius: 14px;
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    font-size: 14px;
+    color: var(--text-200);
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .vs-note strong { color: #fbbf24; }
+  .vs-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    width: 100%;
+    max-width: 1150px;
+  }
+  .vs-card {
+    padding: 28px;
+    border-radius: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: relative;
+  }
+  .vs-card.pros {
+    background: linear-gradient(180deg, rgba(94, 234, 212, 0.08), rgba(94, 234, 212, 0.02));
+    border: 1px solid rgba(94, 234, 212, 0.22);
+  }
+  .vs-card.cons {
+    background: linear-gradient(180deg, rgba(251, 146, 60, 0.08), rgba(251, 146, 60, 0.02));
+    border: 1px solid rgba(251, 146, 60, 0.22);
+  }
+  .vs-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .vs-card.pros .vs-head { color: #5eead4; }
+  .vs-card.cons .vs-head { color: #fb923c; }
+  .vs-head .vs-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .vs-card.pros .vs-icon {
+    background: rgba(94, 234, 212, 0.15);
+    border: 1px solid rgba(94, 234, 212, 0.3);
+  }
+  .vs-card.cons .vs-icon {
+    background: rgba(251, 146, 60, 0.15);
+    border: 1px solid rgba(251, 146, 60, 0.3);
+  }
+  .vs-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .vs-card li {
+    font-size: 13.5px;
+    color: var(--text-200);
+    line-height: 1.5;
+    padding-left: 20px;
+    position: relative;
+  }
+  .vs-card.pros li::before {
+    content: '+';
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #5eead4;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .vs-card.cons li::before {
+    content: '−';
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #fb923c;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .vs-card li strong {
+    color: var(--text-100);
+  }
+
   /* === Slide: AppHost & ServiceDefaults === */
   .project-pair {
     display: grid;
@@ -581,6 +683,28 @@
   .pc-snippet .s { color: #fbbf24; }
   .pc-snippet .c { color: var(--text-400); font-style: italic; }
 
+  .pc-note {
+    margin-top: 4px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    font-size: 12.5px;
+    color: var(--text-200);
+    line-height: 1.5;
+    display: flex;
+    gap: 10px;
+  }
+  .pc-note strong { color: #fbbf24; }
+  .pc-note code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: #5eead4;
+    background: rgba(94, 234, 212, 0.08);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
   /* === Slide: Configuration === */
   .config-wrap {
     width: 100%;
@@ -592,8 +716,8 @@
   .config-precedence {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding: 20px;
+    gap: 6px;
+    padding: 18px;
     border-radius: 18px;
   }
   .prec-header {
@@ -612,7 +736,7 @@
     grid-template-columns: 50px 1fr 1.2fr 80px;
     gap: 14px;
     align-items: center;
-    padding: 12px 14px;
+    padding: 9px 14px;
     border-radius: 12px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.06);
@@ -1000,6 +1124,7 @@
     .features-grid { grid-template-columns: repeat(2, 1fr); }
     .run-wrap { grid-template-columns: 1fr; }
     .project-pair { grid-template-columns: 1fr; }
+    .vs-pair { grid-template-columns: 1fr; }
   }
   @media (max-width: 900px) {
     .grid-2, .usecases { grid-template-columns: 1fr; }
@@ -1043,12 +1168,6 @@
     <span class="eyebrow reveal"><span class="dot"></span>Cloud-Native, Reimagined</span>
     <h1 class="hero reveal">.NET Aspire</h1>
     <p class="title-tagline reveal">The developer's control plane for running, debugging, and shipping <span class="accent">complex multi-service apps</span> — locally and in the cloud.</p>
-    <div class="title-badges reveal">
-      <span class="badge">Microsoft</span>
-      <span class="badge">Open Source</span>
-      <span class="badge">Cloud-Native</span>
-      <span class="badge">.NET 8 / 9 / 10</span>
-    </div>
   </section>
 
   <!-- Slide 2: What & When -->
@@ -1067,7 +1186,7 @@
           <div class="timeline-row"><span class="timeline-date">Nov 2023</span><span>Announced at .NET Conf alongside .NET 8</span></div>
           <div class="timeline-row"><span class="timeline-date">May 2024</span><span>First stable release — Aspire 8.0</span></div>
           <div class="timeline-row"><span class="timeline-date">Nov 2024</span><span>Aspire 9 ships with .NET 9 — polyglot support</span></div>
-          <div class="timeline-row"><span class="timeline-date">2025+</span><span>Maturing ecosystem, deeper Azure & K8s integration</span></div>
+          <div class="timeline-row"><span class="timeline-date">2025+</span><span>Direct Azure provisioning via Bicep (<code style="font-family:'JetBrains Mono',monospace;font-size:0.9em;">AddAzureRedis</code>, <code style="font-family:'JetBrains Mono',monospace;font-size:0.9em;">AddAzureSqlServer</code>…), first-party Kubernetes publisher, tighter <code style="font-family:'JetBrains Mono',monospace;font-size:0.9em;">azd</code> deploy hooks</span></div>
         </div>
       </div>
     </div>
@@ -1128,25 +1247,42 @@
           <p>Replace your <code style="font-family:'JetBrains Mono',monospace;font-size:0.9em;">docker-compose.yml</code> and bespoke startup scripts. F5 starts everything, with logs and traces visible in one dashboard.</p>
         </div>
       </div>
-      <div class="usecase glass reveal">
-        <div class="usecase-num">03</div>
-        <div class="usecase-body">
-          <h4>Onboarding &amp; Dev / Prod Parity</h4>
-          <p>New hire on day one? <code style="font-family:'JetBrains Mono',monospace;font-size:0.9em;">git clone</code>, F5 — full stack running locally with the same Postgres, Redis, and queues that prod uses.</p>
-        </div>
+    </div>
+  </section>
+
+  <!-- Slide 5: Aspire vs Docker -->
+  <section class="slide" data-slide="4">
+    <h2 class="section reveal">Aspire vs <span class="accent">Docker Compose</span></h2>
+    <div class="vs-note reveal">
+      <span>⚠️</span>
+      <span><strong>Aspire doesn't replace Docker</strong> — it replaces <code style="font-family:'JetBrains Mono',monospace;font-size:0.9em;">docker-compose</code> for dev-time orchestration. You still need Docker Desktop or Podman installed locally to run the actual containers (Postgres, Redis, etc.).</span>
+    </div>
+    <div class="vs-pair reveal">
+      <div class="vs-card pros glass">
+        <div class="vs-head"><span class="vs-icon">✓</span>Advantages over Compose</div>
+        <ul>
+          <li><strong>Type-safe topology in C#</strong> — refactor a service name and the compiler finds every consumer. No YAML drift.</li>
+          <li><strong>Automatic service discovery</strong> — connection strings &amp; URLs injected by name, not hard-coded.</li>
+          <li><strong>OpenTelemetry built-in</strong> — logs, metrics, traces wired up with zero SDK setup.</li>
+          <li><strong>Live dashboard</strong> — every log line, env var, and trace span visible at <code style="font-family:'JetBrains Mono',monospace;font-size:0.95em;">localhost</code>, no Kibana/Grafana to deploy.</li>
+          <li><strong>Native debugger</strong> — F5 attaches to your .NET projects directly. No remote debug ceremony.</li>
+          <li><strong>One topology → many targets</strong> — same code emits manifests for Azure, K8s, or Compose itself.</li>
+        </ul>
       </div>
-      <div class="usecase glass reveal">
-        <div class="usecase-num">04</div>
-        <div class="usecase-body">
-          <h4>Event-driven Systems</h4>
-          <p>HTTP APIs, queues, workers, and pub/sub topics — Aspire gives you a unified trace across every hop, so debugging async flows finally feels sane.</p>
-        </div>
+      <div class="vs-card cons glass">
+        <div class="vs-head"><span class="vs-icon">!</span>Trade-offs &amp; limits</div>
+        <ul>
+          <li><strong>The AppHost is C#-only</strong> — your orchestrator lives in .NET, even if every service is Python or Node.</li>
+          <li><strong>Still needs Docker</strong> — Aspire calls into Docker/Podman; it isn't a container runtime itself.</li>
+          <li><strong>Smaller ecosystem</strong> — Compose has a decade of community recipes; Aspire is ~2 years old.</li>
+          <li><strong>Some integrations are community-maintained</strong> — quality varies outside the official set.</li>
+        </ul>
       </div>
     </div>
   </section>
 
-  <!-- Slide 5: Run anything -->
-  <section class="slide" data-slide="4">
+  <!-- Slide 6: Run anything -->
+  <section class="slide" data-slide="5">
     <h2 class="section reveal">Run <span class="accent">anything</span></h2>
     <p class="subtitle reveal" style="margin-bottom:32px;">Aspire isn't .NET-only. One fluent API hosts everything in your stack — frontends, scripts, containers, binaries.</p>
     <div class="run-wrap reveal">
@@ -1168,6 +1304,10 @@
 <span class="c">// Any container image — legacy systems included</span>
 <span class="k">var</span> <span class="p">legacy</span>  = <span class="p">builder</span>.<span class="m">AddContainer</span>(<span class="s">"legacy"</span>, <span class="s">"acme/old:v2"</span>);
 
+<span class="c">// SQL Server + DACPAC deployed to the local container</span>
+<span class="k">var</span> <span class="p">sql</span>     = <span class="p">builder</span>.<span class="m">AddSqlServer</span>(<span class="s">"sql"</span>).<span class="m">AddDatabase</span>(<span class="s">"app"</span>);
+<span class="p">builder</span>.<span class="m">AddSqlProject</span>&lt;<span class="t">Projects.Schema</span>&gt;(<span class="s">"schema"</span>).<span class="m">WithReference</span>(<span class="p">sql</span>);
+
 <span class="p">builder</span>.<span class="m">Build</span>().<span class="m">Run</span>();</pre>
       </div>
       <div class="method-list">
@@ -1179,12 +1319,13 @@
         <div class="method glass"><span class="m-sig">AddContainer()</span><span class="m-desc">Any Docker image from any registry</span></div>
         <div class="method glass"><span class="m-sig">AddDockerfile()</span><span class="m-desc">Build &amp; run a local Dockerfile</span></div>
         <div class="method glass"><span class="m-sig">AddExecutable()</span><span class="m-desc">Any binary on disk — Go, Rust, anything</span></div>
+        <div class="method glass"><span class="m-sig">AddSqlProject&lt;T&gt;()</span><span class="m-desc">Publish a DACPAC / .sqlproj to the local SQL container</span></div>
       </div>
     </div>
   </section>
 
-  <!-- Slide 6: AppHost & ServiceDefaults -->
-  <section class="slide" data-slide="5">
+  <!-- Slide 7: AppHost & ServiceDefaults -->
+  <section class="slide" data-slide="6">
     <h2 class="section reveal">Two projects, <span class="accent">one stack</span></h2>
     <p class="subtitle reveal" style="margin-bottom:32px;">Every Aspire solution has a clean split — orchestration lives in one project, shared cross-cutting concerns in another.</p>
     <div class="project-pair reveal">
@@ -1228,12 +1369,16 @@
 <pre class="pc-snippet"><span class="c">// In each service's Program.cs</span>
 <span class="k">var</span> builder = WebApplication.<span class="m">CreateBuilder</span>(args);
 builder.<span class="m">AddServiceDefaults</span>(); <span class="c">// done.</span></pre>
+        <div class="pc-note">
+          <span>⚠️</span>
+          <span><strong>Heads up:</strong> these defaults apply <em>every time</em> <code>AddServiceDefaults()</code> runs — even without Aspire. <strong>Polly</strong> wraps every <code>HttpClient</code> with 3 retries, 30s total timeout, and a circuit breaker. Tune or opt-out (<code>RemoveAllResilienceHandlers()</code>) if those don't fit your use case.</span>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Slide 7: Configuration -->
-  <section class="slide" data-slide="6">
+  <!-- Slide 8: Configuration -->
+  <section class="slide" data-slide="7">
     <h2 class="section reveal">Configuration &amp; <span class="accent">precedence</span></h2>
     <p class="subtitle reveal" style="margin-bottom:24px;">Both the AppHost and your services have their own <code style="font-family:'JetBrains Mono',monospace;font-size:0.9em;">appsettings.json</code> and user-secrets. Last source wins.</p>
     <div class="config-wrap reveal">
@@ -1265,21 +1410,27 @@ builder.<span class="m">AddServiceDefaults</span>(); <span class="c">// done.</s
           <span class="prec-value">Parameter "api-key" → "aspire-key"</span>
           <span class="prec-tag">AppHost</span>
         </div>
-        <div class="prec-row winner">
+        <div class="prec-row">
           <span class="prec-num">5</span>
-          <span class="prec-source">Environment variables (injected by AppHost)<small>via .WithEnvironment(...) — last in the chain</small></span>
+          <span class="prec-source">OS environment variables<small>From your shell, launchSettings.json, IDE, or CI runner</small></span>
+          <span class="prec-value">ApiKey=os-key</span>
+          <span class="prec-tag">Process</span>
+        </div>
+        <div class="prec-row winner">
+          <span class="prec-num">6</span>
+          <span class="prec-source">AppHost-injected env vars<small>via .WithEnvironment(...) — overlay OS env at spawn time</small></span>
           <span class="prec-value">ApiKey=aspire-key</span>
           <span class="prec-tag">Wins</span>
         </div>
       </div>
       <div class="config-result">
-        Result: the service reads <strong>ApiKey = "aspire-key"</strong> — AppHost-injected env vars override every local file.
+        Result: the service reads <strong>ApiKey = "aspire-key"</strong>. Both OS env vars and AppHost-injected ones flow through the same <code style="font-family:'JetBrains Mono',monospace;font-size:0.9em;color:#5eead4;">EnvironmentVariablesConfigurationProvider</code> — but AppHost layers its values <em>on top</em> of the OS env when spawning the child process, so they win.
       </div>
     </div>
   </section>
 
-  <!-- Slide 8: Integrations -->
-  <section class="slide" data-slide="7">
+  <!-- Slide 9: Integrations -->
+  <section class="slide" data-slide="8">
     <h2 class="section reveal">Common <span class="accent">integrations</span></h2>
     <p class="subtitle reveal" style="margin-bottom:36px;">Drop-in components — add a NuGet package, get a wired-up, observable client.</p>
     <div class="integrations reveal">
@@ -1316,8 +1467,8 @@ builder.<span class="m">AddServiceDefaults</span>(); <span class="c">// done.</s
     </a>
   </section>
 
-  <!-- Slide 9: Demo Coming -->
-  <section class="slide" data-slide="8">
+  <!-- Slide 10: Demo Coming -->
+  <section class="slide" data-slide="9">
     <div class="demo-container">
       <div class="demo-orb reveal"></div>
       <span class="eyebrow reveal"><span class="dot"></span>Hands-on next</span>
