@@ -1,0 +1,2259 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Casely</title>
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+        />
+        <style>
+            :root {
+                --ink: #1c1917;
+                --paper: #f7f5f2;
+                --slate: #78716c;
+                --red: #dc2626;
+                --red-wash: #fef2f2;
+                --red-border: #fca5a5;
+                --green: #16a34a;
+                --green-wash: #f0fdf4;
+                --green-border: #86efac;
+                --rule: #d6d3d1;
+                --surface: #ffffff;
+                --dim: #a8a29e;
+                color-scheme: light;
+            }
+            @media (prefers-color-scheme: dark) {
+                :root:not([data-theme="light"]) {
+                    --ink: #e7e5e4;
+                    --paper: #1c1917;
+                    --slate: #a8a29e;
+                    --red: #ef4444;
+                    --red-wash: #2a1515;
+                    --red-border: #7f1d1d;
+                    --green: #4ade80;
+                    --green-wash: #152a15;
+                    --green-border: #14532d;
+                    --rule: #44403c;
+                    --surface: #292524;
+                    --dim: #78716c;
+                    color-scheme: dark;
+                }
+            }
+            :root[data-theme="dark"] {
+                --ink: #e7e5e4;
+                --paper: #1c1917;
+                --slate: #a8a29e;
+                --red: #ef4444;
+                --red-wash: #2a1515;
+                --red-border: #7f1d1d;
+                --green: #4ade80;
+                --green-wash: #152a15;
+                --green-border: #14532d;
+                --rule: #44403c;
+                --surface: #292524;
+                --dim: #78716c;
+                color-scheme: dark;
+            }
+
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                background: var(--paper);
+                color: var(--ink);
+                font-family: "IBM Plex Sans", system-ui, sans-serif;
+                line-height: 1.5;
+                overflow: hidden;
+                height: 100vh;
+                width: 100vw;
+            }
+
+            .deck {
+                position: relative;
+                width: 100%;
+                height: 100%;
+            }
+
+            .slide {
+                position: absolute;
+                inset: 0;
+                display: none;
+                flex-direction: column;
+                justify-content: center;
+                padding: 4vh 6vw;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+            .slide.active {
+                display: flex;
+                opacity: 1;
+            }
+
+            .slide-number {
+                position: fixed;
+                bottom: 2vh;
+                right: 3vw;
+                font-family: "IBM Plex Mono", monospace;
+                font-size: 0.75rem;
+                color: var(--dim);
+                letter-spacing: 0.05em;
+                z-index: 100;
+            }
+
+            .progress-bar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 3px;
+                background: var(--red);
+                transition: width 0.3s ease;
+                z-index: 100;
+            }
+
+            /* Title slide */
+            .title-slide {
+                justify-content: flex-end;
+                padding-bottom: 12vh;
+            }
+            .title-slide .logo {
+                width: clamp(48px, 5vw, 72px);
+                height: clamp(48px, 5vw, 72px);
+                border-radius: 8px;
+                margin-bottom: 1.25rem;
+            }
+            .title-slide .eyebrow {
+                font-family: "IBM Plex Mono", monospace;
+                font-size: clamp(0.8rem, 1.1vw, 0.95rem);
+                font-weight: 500;
+                color: var(--slate);
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                margin-bottom: 1.5rem;
+            }
+            .title-slide h1 {
+                font-family: "Bitter", Georgia, serif;
+                font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+                font-weight: 700;
+                line-height: 1.05;
+                text-wrap: balance;
+                margin-bottom: 1rem;
+                max-width: 18ch;
+            }
+            .title-slide h1 .vs {
+                color: var(--slate);
+                font-weight: 400;
+            }
+            .title-slide .subtitle {
+                font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+                color: var(--slate);
+                max-width: 44ch;
+            }
+            .title-slide .date {
+                font-family: "IBM Plex Mono", monospace;
+                font-size: 0.9rem;
+                color: var(--dim);
+                margin-top: 2rem;
+            }
+
+            /* Verdict slide */
+            .verdict-row {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: clamp(1.5rem, 4vw, 3rem);
+                margin: 3rem 0;
+            }
+            .verdict-box {
+                padding: clamp(1.5rem, 3vw, 2.5rem);
+                border-radius: 4px;
+            }
+            .verdict-box.bad {
+                background: var(--red-wash);
+                border: 1.5px solid var(--red-border);
+            }
+            .verdict-box.good {
+                background: var(--green-wash);
+                border: 1.5px solid var(--green-border);
+            }
+            .verdict-box .model-name {
+                font-family: "IBM Plex Mono", monospace;
+                font-size: clamp(0.85rem, 1.1vw, 1rem);
+                font-weight: 500;
+                letter-spacing: 0.04em;
+                margin-bottom: 0.75rem;
+            }
+            .verdict-box.bad .model-name {
+                color: var(--red);
+            }
+            .verdict-box.good .model-name {
+                color: var(--green);
+            }
+            .verdict-box .model-desc {
+                font-size: clamp(0.75rem, 1vw, 0.85rem);
+                color: var(--slate);
+                line-height: 1.45;
+                margin-bottom: 0.75rem;
+            }
+            .verdict-box .big-number {
+                font-family: "Bitter", Georgia, serif;
+                font-size: clamp(3rem, 7vw, 5.5rem);
+                font-weight: 700;
+                line-height: 1;
+                font-variant-numeric: tabular-nums;
+            }
+            .verdict-box.bad .big-number {
+                color: var(--red);
+            }
+            .verdict-box.good .big-number {
+                color: var(--green);
+            }
+            .verdict-box .unit {
+                font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+                color: var(--slate);
+                margin-top: 0.5rem;
+            }
+            .verdict-mention {
+                margin-top: 1.5rem;
+                padding: clamp(1rem, 2vw, 1.5rem);
+                border-radius: 4px;
+                background: color-mix(in srgb, var(--ink) 5%, transparent);
+                border: 1px dashed var(--slate);
+                text-align: center;
+            }
+            .verdict-mention .model-name {
+                font-family: "IBM Plex Mono", monospace;
+                font-size: clamp(0.85rem, 1.1vw, 1rem);
+                font-weight: 500;
+                letter-spacing: 0.04em;
+                color: var(--ink);
+                margin-bottom: 0.4rem;
+            }
+            .verdict-mention .model-desc {
+                font-size: clamp(0.75rem, 1vw, 0.85rem);
+                color: var(--slate);
+                line-height: 1.45;
+            }
+
+            /* Section heading in slides */
+            .slide h2 {
+                font-family: "Bitter", Georgia, serif;
+                font-size: clamp(1.8rem, 3.2vw, 2.8rem);
+                font-weight: 700;
+                line-height: 1.15;
+                text-wrap: balance;
+                margin-bottom: 0.5rem;
+            }
+            .slide .section-sub {
+                font-size: clamp(1rem, 1.3vw, 1.15rem);
+                color: var(--slate);
+                margin-bottom: 2rem;
+            }
+
+            /* Setup / methodology */
+            .setup-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem 3rem;
+                margin-top: 2rem;
+            }
+            .setup-item {
+                border-top: 1.5px solid var(--rule);
+                padding-top: 0.75rem;
+            }
+            .setup-item .label {
+                font-family: "IBM Plex Mono", monospace;
+                font-size: 0.8rem;
+                font-weight: 500;
+                color: var(--dim);
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                margin-bottom: 0.35rem;
+            }
+            .setup-item .value {
+                font-size: clamp(1rem, 1.3vw, 1.15rem);
+                color: var(--ink);
+            }
+
+            /* Comparison slides */
+            .comparison-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1px;
+                background: var(--rule);
+                border: 1px solid var(--rule);
+                border-radius: 4px;
+                overflow: hidden;
+                flex: 1;
+                min-height: 0;
+            }
+            .comparison-panel {
+                background: var(--surface);
+                padding: clamp(1rem, 2vw, 1.5rem);
+                display: flex;
+                flex-direction: column;
+                overflow-y: auto;
+            }
+            .comparison-panel .panel-tag {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-family: "IBM Plex Mono", monospace;
+                font-size: 0.82rem;
+                font-weight: 600;
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+                padding: 0.2rem 0.6rem;
+                border-radius: 2px;
+                margin-bottom: 0.75rem;
+                width: fit-content;
+            }
+            .comparison-panel.bad .panel-tag {
+                background: var(--red-wash);
+                color: var(--red);
+                border: 1px solid var(--red-border);
+            }
+            .comparison-panel.good .panel-tag {
+                background: var(--green-wash);
+                color: var(--green);
+                border: 1px solid var(--green-border);
+            }
+            .specimen {
+                font-family: "IBM Plex Mono", monospace;
+                font-size: clamp(0.75rem, 1vw, 0.88rem);
+                line-height: 1.75;
+                white-space: normal;
+                word-break: break-word;
+                color: var(--ink);
+            }
+            .specimen mark {
+                background: var(--red-wash);
+                color: var(--red);
+                border-bottom: 2px solid var(--red);
+                padding: 0 0.15rem;
+                border-radius: 1px;
+                font-weight: 600;
+                text-decoration: none;
+            }
+            .specimen .ann {
+                font-family: "IBM Plex Sans", sans-serif;
+                font-size: 0.75rem;
+                color: var(--red);
+                font-style: italic;
+            }
+
+            /* Error catalog */
+            .error-table-wrap {
+                overflow-x: auto;
+                flex: 1;
+                min-height: 0;
+            }
+            .error-catalog {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: clamp(0.88rem, 1.1vw, 1rem);
+            }
+            .error-catalog th {
+                font-family: "IBM Plex Mono", monospace;
+                font-size: 0.78rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                color: var(--dim);
+                text-align: left;
+                padding: 0.65rem 0.85rem;
+                border-bottom: 2px solid var(--rule);
+                position: sticky;
+                top: 0;
+                background: var(--paper);
+            }
+            .error-catalog td {
+                padding: 0.6rem 0.85rem;
+                border-bottom: 1px solid var(--rule);
+                vertical-align: top;
+            }
+            .error-catalog .err {
+                font-family: "IBM Plex Mono", monospace;
+                font-weight: 600;
+                color: var(--red);
+                background: var(--red-wash);
+                padding: 0.15rem 0.35rem;
+                border-radius: 2px;
+                font-size: 0.92rem;
+            }
+            .error-catalog .fix {
+                font-family: "IBM Plex Mono", monospace;
+                font-weight: 500;
+                color: var(--green);
+                background: var(--green-wash);
+                padding: 0.15rem 0.35rem;
+                border-radius: 2px;
+                font-size: 0.92rem;
+            }
+            .error-catalog .type-tag {
+                font-family: "IBM Plex Mono", monospace;
+                font-size: 0.78rem;
+                font-weight: 500;
+                color: var(--slate);
+                background: var(--surface);
+                border: 1px solid var(--rule);
+                padding: 0.15rem 0.4rem;
+                border-radius: 2px;
+                white-space: nowrap;
+            }
+
+            /* Screenshots slide */
+            .screenshot-mosaic {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.75rem;
+                flex: 1;
+                min-height: 0;
+            }
+            .screenshot-thumb {
+                position: relative;
+                cursor: pointer;
+                border-radius: 4px;
+                overflow: hidden;
+                border: 1px solid var(--rule);
+            }
+            .screenshot-thumb img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+                transition: filter 0.2s ease;
+            }
+            .screenshot-thumb:hover img {
+                filter: brightness(0.85);
+            }
+            .screenshot-thumb .zoom-icon {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) scale(0.8);
+                width: 40px;
+                height: 40px;
+                background: rgba(28, 25, 23, 0.7);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                transition:
+                    opacity 0.2s ease,
+                    transform 0.2s ease;
+                pointer-events: none;
+            }
+            .screenshot-thumb:hover .zoom-icon {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            .zoom-icon svg {
+                width: 18px;
+                height: 18px;
+                stroke: #fff;
+                stroke-width: 2;
+                fill: none;
+            }
+            .screenshot-mosaic .cap {
+                font-family: "IBM Plex Mono", monospace;
+                font-size: 0.75rem;
+                color: var(--dim);
+                margin-top: 0.35rem;
+                text-align: center;
+            }
+
+            /* Lightbox */
+            .lightbox {
+                position: fixed;
+                inset: 0;
+                z-index: 1000;
+                background: rgba(28, 25, 23, 0.88);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.25s ease;
+                backdrop-filter: blur(4px);
+                -webkit-backdrop-filter: blur(4px);
+            }
+            .lightbox.open {
+                opacity: 1;
+                pointer-events: auto;
+            }
+            .lightbox-inner {
+                position: relative;
+                width: 92vw;
+                height: 90vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .lightbox-viewport {
+                flex: 1;
+                min-height: 0;
+                width: 100%;
+                overflow: auto;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: grab;
+            }
+            .lightbox-viewport.dragging {
+                cursor: grabbing;
+            }
+            .lightbox-viewport img {
+                max-width: none;
+                max-height: none;
+                transition:
+                    width 0.15s ease,
+                    height 0.15s ease;
+                border-radius: 4px;
+                box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+                display: block;
+                flex-shrink: 0;
+            }
+            .lightbox-viewport img.fit {
+                max-width: 100%;
+                max-height: 100%;
+                width: auto;
+                height: auto;
+            }
+            .lightbox-bottom {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 1rem;
+                padding-top: 0.6rem;
+                flex-shrink: 0;
+            }
+            .lightbox-caption {
+                font-family: "IBM Plex Mono", monospace;
+                font-size: 0.85rem;
+                color: #a8a29e;
+            }
+            .zoom-controls {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+            }
+            .zoom-btn {
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                color: #e7e5e4;
+                font-family: "IBM Plex Mono", monospace;
+                font-size: 1rem;
+                width: 32px;
+                height: 32px;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: background 0.15s;
+                line-height: 1;
+            }
+            .zoom-btn:hover {
+                background: rgba(255, 255, 255, 0.2);
+            }
+            .zoom-level {
+                font-family: "IBM Plex Mono", monospace;
+                font-size: 0.75rem;
+                color: #a8a29e;
+                min-width: 3.5em;
+                text-align: center;
+                font-variant-numeric: tabular-nums;
+            }
+            .zoom-btn.fit-btn {
+                font-size: 0.65rem;
+                width: auto;
+                padding: 0 0.5rem;
+                letter-spacing: 0.03em;
+            }
+            .lightbox-close {
+                position: absolute;
+                top: -0.25rem;
+                right: 0;
+                background: none;
+                border: none;
+                color: #a8a29e;
+                font-family: "IBM Plex Mono", monospace;
+                font-size: 0.8rem;
+                cursor: pointer;
+                padding: 0.25rem 0.5rem;
+                letter-spacing: 0.04em;
+                transition: color 0.15s;
+                z-index: 10;
+            }
+            .lightbox-close:hover {
+                color: #fff;
+            }
+            .lightbox-nav {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                color: #e7e5e4;
+                font-size: 1.2rem;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: background 0.15s;
+                z-index: 10;
+            }
+            .lightbox-nav:hover {
+                background: rgba(255, 255, 255, 0.2);
+            }
+            .lightbox-nav.prev {
+                left: -3.5rem;
+            }
+            .lightbox-nav.next {
+                right: -3.5rem;
+            }
+            @media (max-width: 700px) {
+                .lightbox-nav.prev {
+                    left: 0.5rem;
+                }
+                .lightbox-nav.next {
+                    right: 0.5rem;
+                }
+            }
+
+            /* Architecture flowchart slide */
+            .arch-slide {
+                justify-content: flex-start;
+                padding-top: 3.5vh;
+            }
+            .flow-row {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0;
+                margin: 1.5rem 0 1rem;
+                flex-wrap: nowrap;
+            }
+            .flow-node {
+                background: var(--surface);
+                border: 1.5px solid var(--rule);
+                border-radius: 6px;
+                padding: 0.6rem 1rem;
+                text-align: center;
+                cursor: pointer;
+                transition:
+                    border-color 0.15s,
+                    box-shadow 0.15s,
+                    transform 0.12s;
+                position: relative;
+                min-width: 0;
+                flex-shrink: 1;
+            }
+            .flow-node:hover {
+                border-color: var(--slate);
+                box-shadow: 0 2px 8px var(--shadow, rgba(40, 30, 20, 0.1));
+                transform: translateY(-1px);
+            }
+            .flow-node.active {
+                border-color: var(--ink);
+                box-shadow: 0 2px 12px var(--shadow, rgba(40, 30, 20, 0.15));
+            }
+            .flow-node .node-icon {
+                font-size: 1.3rem;
+                margin-bottom: 0.2rem;
+                line-height: 1;
+            }
+            .flow-node .node-label {
+                font-family: "IBM Plex Mono", monospace;
+                font-size: clamp(0.62rem, 0.8vw, 0.75rem);
+                font-weight: 600;
+                letter-spacing: 0.02em;
+                color: var(--ink);
+                white-space: nowrap;
+            }
+            .flow-node .node-sub {
+                font-family: "IBM Plex Sans", sans-serif;
+                font-size: clamp(0.55rem, 0.65vw, 0.65rem);
+                color: var(--slate);
+                margin-top: 0.1rem;
+            }
+            .flow-arrow {
+                color: var(--dim);
+                font-size: 1.1rem;
+                padding: 0 0.25rem;
+                flex-shrink: 0;
+                line-height: 1;
+                user-select: none;
+            }
+            .flow-loop {
+                position: relative;
+            }
+            .flow-loop::after {
+                content: "";
+                position: absolute;
+                bottom: -10px;
+                left: 20%;
+                right: 20%;
+                height: 6px;
+                border: 1.5px dashed var(--dim);
+                border-top: none;
+                border-radius: 0 0 6px 6px;
+            }
+
+            .detail-area {
+                flex: 1;
+                min-height: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .detail-hint {
+                color: var(--dim);
+                font-family: "IBM Plex Mono", monospace;
+                font-size: 0.85rem;
+                text-align: center;
+            }
+            .detail-card {
+                display: none;
+                background: var(--surface);
+                border: 1px solid var(--rule);
+                border-radius: 6px;
+                padding: clamp(1.2rem, 2vw, 2rem);
+                width: 100%;
+                max-width: 56rem;
+                animation: cardIn 0.2s ease;
+            }
+            .detail-card.visible {
+                display: block;
+            }
+            @keyframes cardIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(8px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            .detail-card .card-header {
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+                margin-bottom: 1rem;
+                padding-bottom: 0.75rem;
+                border-bottom: 1.5px solid var(--rule);
+            }
+            .detail-card .card-icon {
+                font-size: 1.4rem;
+            }
+            .detail-card .card-title {
+                font-family: "Bitter", Georgia, serif;
+                font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+                font-weight: 700;
+            }
+            .detail-card .card-model {
+                font-family: "IBM Plex Mono", monospace;
+                font-size: 0.78rem;
+                color: var(--slate);
+                background: var(--code-bg, var(--surface));
+                padding: 0.15rem 0.5rem;
+                border-radius: 3px;
+                border: 1px solid var(--rule);
+                margin-left: auto;
+            }
+            .detail-card .card-body {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+                gap: 1rem 2rem;
+            }
+            .detail-card .stat-block {
+                border-top: 1px solid var(--rule);
+                padding-top: 0.6rem;
+            }
+            .detail-card .stat-label {
+                font-family: "IBM Plex Mono", monospace;
+                font-size: 0.7rem;
+                font-weight: 500;
+                color: var(--dim);
+                letter-spacing: 0.06em;
+                text-transform: uppercase;
+                margin-bottom: 0.2rem;
+            }
+            .detail-card .stat-value {
+                font-size: clamp(0.92rem, 1.1vw, 1.05rem);
+                color: var(--ink);
+                line-height: 1.45;
+            }
+            .detail-card .stat-value code {
+                font-family: "IBM Plex Mono", monospace;
+                font-size: 0.88em;
+                background: var(--code-bg, var(--surface));
+                padding: 0.1rem 0.3rem;
+                border-radius: 2px;
+                border: 1px solid var(--rule);
+            }
+
+            .detail-card .card-screenshot {
+                border: 1px solid var(--rule);
+                border-radius: 4px;
+                overflow: hidden;
+                max-height: 22vh;
+                cursor: pointer;
+            }
+            .detail-card .card-screenshot img {
+                width: 100%;
+                height: auto;
+                display: block;
+            }
+            .detail-card .card-screenshot .ss-label {
+                font-family: "IBM Plex Mono", monospace;
+                font-size: 0.68rem;
+                color: var(--dim);
+                padding: 0.3rem 0.5rem;
+                background: var(--surface);
+                border-top: 1px solid var(--rule);
+                text-align: center;
+            }
+
+            @media (max-width: 700px) {
+                .flow-row {
+                    flex-wrap: wrap;
+                    gap: 0.3rem;
+                }
+                .flow-arrow {
+                    display: none;
+                }
+                .detail-card .card-body {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            /* Conclusion slide */
+            .conclusion-slide {
+                justify-content: center;
+                align-items: flex-start;
+            }
+            .conclusion-slide .takeaway {
+                font-family: "Bitter", Georgia, serif;
+                font-size: clamp(1.3rem, 2.4vw, 2rem);
+                line-height: 1.45;
+                max-width: 38ch;
+                text-wrap: balance;
+                margin-bottom: 2rem;
+            }
+            .conclusion-slide .takeaway strong {
+                color: var(--green);
+                font-weight: 700;
+            }
+            .conclusion-summary {
+                display: flex;
+                gap: 3rem;
+                margin-top: 1rem;
+            }
+            .conclusion-stat {
+                border-top: 1.5px solid var(--rule);
+                padding-top: 0.75rem;
+            }
+            .conclusion-stat .num {
+                font-family: "Bitter", Georgia, serif;
+                font-size: 2rem;
+                font-weight: 700;
+                font-variant-numeric: tabular-nums;
+            }
+            .conclusion-stat .num.red {
+                color: var(--red);
+            }
+            .conclusion-stat .num.green {
+                color: var(--green);
+            }
+            .conclusion-stat .desc {
+                font-size: 0.95rem;
+                color: var(--slate);
+            }
+
+            /* Navigation hint */
+            .nav-hint {
+                position: fixed;
+                bottom: 2vh;
+                left: 3vw;
+                font-family: "IBM Plex Mono", monospace;
+                font-size: 0.68rem;
+                color: var(--dim);
+                letter-spacing: 0.03em;
+                z-index: 100;
+                transition: opacity 0.5s ease;
+            }
+            .nav-hint.faded {
+                opacity: 0;
+            }
+
+            /* Touch nav buttons */
+            .nav-btn {
+                position: fixed;
+                bottom: 2vh;
+                background: var(--surface);
+                border: 1px solid var(--rule);
+                color: var(--slate);
+                font-family: "IBM Plex Mono", monospace;
+                font-size: 0.75rem;
+                padding: 0.4rem 0.8rem;
+                border-radius: 3px;
+                cursor: pointer;
+                z-index: 100;
+                display: none;
+            }
+            .nav-btn:hover {
+                color: var(--ink);
+            }
+            .nav-btn.prev {
+                left: 50%;
+                transform: translateX(calc(-100% - 0.5rem));
+            }
+            .nav-btn.next {
+                left: 50%;
+                transform: translateX(0.5rem);
+            }
+
+            @media (hover: none) {
+                .nav-btn {
+                    display: block;
+                }
+                .nav-hint {
+                    display: none;
+                }
+            }
+
+            @media (max-width: 700px) {
+                .slide {
+                    padding: 3vh 4vw;
+                }
+                .verdict-row {
+                    grid-template-columns: 1fr;
+                }
+                .comparison-grid {
+                    grid-template-columns: 1fr;
+                }
+                .setup-grid {
+                    grid-template-columns: 1fr;
+                }
+                .screenshot-mosaic {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+                .conclusion-summary {
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="progress-bar" id="progress"></div>
+        <div class="slide-number" id="slideNum"></div>
+        <div class="nav-hint" id="navHint">← → or click to navigate</div>
+        <button class="nav-btn prev" onclick="go(-1)">← Prev</button>
+        <button class="nav-btn next" onclick="go(1)">Next →</button>
+
+        <div class="deck" id="deck">
+            <!-- SLIDE 1: Title -->
+            <div class="slide title-slide">
+                <img class="logo" src="icon-300.png" alt="Casely logo" />
+                <div class="eyebrow">Czech-law RAG assistant · August 2026</div>
+                <h1>Casely</h1>
+                <div class="subtitle">
+                    Architecture, LLM choice, and Czech language quality in
+                    generated legal documents
+                </div>
+                <div class="date">Local-first AI for Czech legal practice</div>
+            </div>
+
+            <!-- SLIDE 2: What is Casely -->
+            <div class="slide">
+                <h2>What is Casely</h2>
+                <div class="section-sub">
+                    A local legal AI for Czech lawyers.
+                </div>
+                <div class="setup-grid">
+                    <div class="setup-item">
+                        <div class="label">Purpose</div>
+                        <div class="value">
+                            Manage client case files, draft legal documents, and
+                            ground every answer in active Czech law
+                        </div>
+                    </div>
+                    <div class="setup-item">
+                        <div class="label">Law source</div>
+                        <div class="value">
+                            e-Sb&iacute;rka — the official Czech open-data
+                            statute book, updated daily. Both current in-force
+                            law and historical versions (partitioned by decade
+                            back to the 1990s) are indexed, so the system can
+                            answer about repealed law too
+                        </div>
+                    </div>
+                    <div class="setup-item">
+                        <div class="label">Client data</div>
+                        <div class="value">
+                            Case files, contracts, and scanned documents are
+                            ingested per matter. Scans and photos are
+                            transcribed by a vision model (Tesseract 5). All
+                            data stays local
+                        </div>
+                    </div>
+                    <div class="setup-item">
+                        <div class="label">Inference</div>
+                        <div class="value">
+                            Runs fully local on a single GPU (RTX 4000
+                            Blackwell, 4-bit quantization), or targets a remote
+                            inference endpoint for end-users who are not lawyers
+                            and only need on-demand access
+                        </div>
+                    </div>
+                    <div class="setup-item">
+                        <div class="label">App</div>
+                        <div class="value">
+                            Electron / React desktop app, FastAPI backend.
+                            Answers streaming using WebSocket
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 3: App screenshots -->
+            <div class="slide">
+                <h2>How Does the App Look?</h2>
+                <div class="section-sub">
+                    Live screenshots from the desktop app +
+                    <a href="https://www.youtube.com/watch?v=H6xGnqtA20g"
+                        >video</a
+                    >
+                </div>
+                <div class="screenshot-mosaic">
+                    <div>
+                        <div class="screenshot-thumb" onclick="openLightbox(0)">
+                            <img
+                                src="screenshots/live_01_matters.png"
+                                alt="Matters overview"
+                            />
+                            <div class="zoom-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="10.5" cy="10.5" r="7" />
+                                    <line x1="15.5" y1="15.5" x2="21" y2="21" />
+                                    <line x1="8" y1="10.5" x2="13" y2="10.5" />
+                                    <line x1="10.5" y1="8" x2="10.5" y2="13" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="cap">Matters overview</div>
+                    </div>
+                    <div>
+                        <div class="screenshot-thumb" onclick="openLightbox(1)">
+                            <img
+                                src="screenshots/live_04_prompt.png"
+                                alt="User prompt"
+                            />
+                            <div class="zoom-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="10.5" cy="10.5" r="7" />
+                                    <line x1="15.5" y1="15.5" x2="21" y2="21" />
+                                    <line x1="8" y1="10.5" x2="13" y2="10.5" />
+                                    <line x1="10.5" y1="8" x2="10.5" y2="13" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="cap">User prompt</div>
+                    </div>
+                    <div>
+                        <div class="screenshot-thumb" onclick="openLightbox(2)">
+                            <img
+                                src="screenshots/live_06_response.png"
+                                alt="Model response"
+                            />
+                            <div class="zoom-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="10.5" cy="10.5" r="7" />
+                                    <line x1="15.5" y1="15.5" x2="21" y2="21" />
+                                    <line x1="8" y1="10.5" x2="13" y2="10.5" />
+                                    <line x1="10.5" y1="8" x2="10.5" y2="13" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="cap">Model response</div>
+                    </div>
+                    <div>
+                        <div class="screenshot-thumb" onclick="openLightbox(3)">
+                            <img
+                                src="screenshots/live_09_response_summary.png"
+                                alt="Response summary"
+                            />
+                            <div class="zoom-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="10.5" cy="10.5" r="7" />
+                                    <line x1="15.5" y1="15.5" x2="21" y2="21" />
+                                    <line x1="8" y1="10.5" x2="13" y2="10.5" />
+                                    <line x1="10.5" y1="8" x2="10.5" y2="13" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="cap">Response summary</div>
+                    </div>
+                    <div>
+                        <div class="screenshot-thumb" onclick="openLightbox(4)">
+                            <img
+                                src="screenshots/live_10_draft_document.png"
+                                alt="Generated document"
+                            />
+                            <div class="zoom-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="10.5" cy="10.5" r="7" />
+                                    <line x1="15.5" y1="15.5" x2="21" y2="21" />
+                                    <line x1="8" y1="10.5" x2="13" y2="10.5" />
+                                    <line x1="10.5" y1="8" x2="10.5" y2="13" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="cap">Generated document</div>
+                    </div>
+                    <div>
+                        <div class="screenshot-thumb" onclick="openLightbox(5)">
+                            <img
+                                src="screenshots/live_12_draft_bottom.png"
+                                alt="Document footer"
+                            />
+                            <div class="zoom-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="10.5" cy="10.5" r="7" />
+                                    <line x1="15.5" y1="15.5" x2="21" y2="21" />
+                                    <line x1="8" y1="10.5" x2="13" y2="10.5" />
+                                    <line x1="10.5" y1="8" x2="10.5" y2="13" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="cap">Document footer</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 4: Architecture -->
+            <div class="slide arch-slide">
+                <h2>RAG Pipeline Architecture</h2>
+                <div class="section-sub">
+                    Click any component for details. Hybrid retrieval, BGE-M3
+                    reranking, agentic loop.
+                </div>
+
+                <div class="flow-row">
+                    <div
+                        class="flow-node"
+                        onclick="showDetail('query')"
+                        data-node="query"
+                    >
+                        <div class="node-icon">&#9998;</div>
+                        <div class="node-label">Query</div>
+                        <div class="node-sub">intent routing</div>
+                    </div>
+                    <div class="flow-arrow">&#8594;</div>
+                    <div
+                        class="flow-node"
+                        onclick="showDetail('embed')"
+                        data-node="embed"
+                    >
+                        <div class="node-icon">&#9641;</div>
+                        <div class="node-label">Embed</div>
+                        <div class="node-sub">BGE-M3</div>
+                    </div>
+                    <div class="flow-arrow">&#8594;</div>
+                    <div
+                        class="flow-node"
+                        onclick="showDetail('search')"
+                        data-node="search"
+                    >
+                        <div class="node-icon">&#8982;</div>
+                        <div class="node-label">Hybrid search</div>
+                        <div class="node-sub">pgvector</div>
+                    </div>
+                    <div class="flow-arrow">&#8594;</div>
+                    <div
+                        class="flow-node"
+                        onclick="showDetail('rrf')"
+                        data-node="rrf"
+                    >
+                        <div class="node-icon">&#8726;</div>
+                        <div class="node-label">RRF fusion</div>
+                        <div class="node-sub">~40 candidates</div>
+                    </div>
+                    <div class="flow-arrow">&#8594;</div>
+                    <div
+                        class="flow-node"
+                        onclick="showDetail('rerank')"
+                        data-node="rerank"
+                    >
+                        <div class="node-icon">&#9670;</div>
+                        <div class="node-label">Rerank</div>
+                        <div class="node-sub">BGE-M3 reranker</div>
+                    </div>
+                    <div class="flow-arrow">&#8594;</div>
+                    <div
+                        class="flow-node flow-loop"
+                        onclick="showDetail('generate')"
+                        data-node="generate"
+                    >
+                        <div class="node-icon">&#9881;</div>
+                        <div class="node-label">Generator</div>
+                        <div class="node-sub">LLM + agent</div>
+                    </div>
+                    <div class="flow-arrow">&#8594;</div>
+                    <div
+                        class="flow-node"
+                        onclick="showDetail('output')"
+                        data-node="output"
+                    >
+                        <div class="node-icon">&#9745;</div>
+                        <div class="node-label">Output</div>
+                        <div class="node-sub">answer / draft</div>
+                    </div>
+                </div>
+
+                <div class="detail-area" id="detailArea">
+                    <div class="detail-hint" id="detailHint">
+                        Click a component in the flow diagram
+                    </div>
+
+                    <div class="detail-card" id="detail-query">
+                        <div class="card-header">
+                            <span class="card-icon">&#9998;</span>
+                            <span class="card-title"
+                                >Query &amp; Intent Routing</span
+                            >
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-block">
+                                <div class="stat-label">
+                                    Stage 1 — code filter
+                                </div>
+                                <div class="stat-value">
+                                    Czech verb stems and document-type nouns are
+                                    matched in code. If nothing triggers, the
+                                    turn is a question — no LLM call needed.<br /><code
+                                        style="opacity: 0.7"
+                                        >&quot;Jaká je výpovědní
+                                        doba?&quot;</code
+                                    >
+                                    → no trigger → <code>answer</code>
+                                </div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-label">
+                                    Stage 2 — LLM classification
+                                </div>
+                                <div class="stat-value">
+                                    Only runs when stage 1 triggers. Constrained
+                                    JSON output: <code>answer</code> |
+                                    <code>draft</code> |
+                                    <code>revise</code>.<br /><code
+                                        style="opacity: 0.7"
+                                        >&quot;Sepiš předžalobní výzvu pro pana
+                                        Nováka.&quot;</code
+                                    >
+                                    → <code>sepiš</code> triggers → LLM →
+                                    <code>draft</code>
+                                </div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-label">Two response modes</div>
+                                <div class="stat-value">
+                                    Single-shot pipeline (direct answer) or
+                                    multi-hop research agent (up to 8 steps)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-card" id="detail-embed">
+                        <div class="card-header">
+                            <span class="card-icon">&#9641;</span>
+                            <span class="card-title">Embedding</span>
+                            <span class="card-model">BAAI/bge-m3</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-block">
+                                <div class="stat-label">Dense vector</div>
+                                <div class="stat-value">
+                                    <code>1024</code> dimensions — captures
+                                    meaning, not exact words.
+                                    <code>&quot;nájemné&quot;</code> and
+                                    <code>&quot;nájem bytu&quot;</code> land
+                                    close together even though the words differ
+                                </div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-label">Sparse vector</div>
+                                <div class="stat-value">
+                                    Lexical weights over a 250k-token
+                                    vocabulary, pruned to top
+                                    <code>1000</code> non-zero entries. Catches
+                                    exact terms dense misses:
+                                    <code>&quot;§&nbsp;2205&quot;</code>,
+                                    <code
+                                        >&quot;č.&nbsp;89/2012&nbsp;Sb.&quot;</code
+                                    >
+                                </div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-label">
+                                    XLM-RoBERTa backbone
+                                </div>
+                                <div class="stat-value">
+                                    A multilingual transformer pre-trained on
+                                    100 languages including Czech. BGE-M3 is
+                                    built on top of it — this is why it handles
+                                    Czech diacritics and morphology well out of
+                                    the box
+                                </div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-label">Chunking</div>
+                                <div class="stat-value">
+                                    Target <code>1000</code> tokens, max
+                                    <code>1200</code>, overlap <code>100</code>.
+                                    Each chunk carries a contextual header with
+                                    the § path and statute title
+                                </div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-label">Why BGE-M3</div>
+                                <div class="stat-value">
+                                    Only model that produces dense + sparse in a
+                                    single pass, so both retrieval channels
+                                    share one embedding call
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-card" id="detail-search">
+                        <div class="card-header">
+                            <span class="card-icon">&#8982;</span>
+                            <span class="card-title">Hybrid Search</span>
+                            <span class="card-model">pgvector</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-block">
+                                <div class="stat-label">Dense KNN</div>
+                                <div class="stat-value">
+                                    Top <code>20</code> candidates
+                                    (<code>TOP_K_DENSE=20</code>)
+                                </div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-label">Sparse KNN</div>
+                                <div class="stat-value">
+                                    Top <code>20</code> candidates
+                                    (<code>TOP_K_SPARSE=20</code>) — catches
+                                    exact legal terms that dense misses
+                                </div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-label">Temporal filter</div>
+                                <div class="stat-value">
+                                    <code
+                                        >valid_from &le; date AND valid_to &ge;
+                                        date</code
+                                    >
+                                    — only returns the currently in-force
+                                    version of each statute
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-card" id="detail-rrf">
+                        <div class="card-header">
+                            <span class="card-icon">&#8726;</span>
+                            <span class="card-title"
+                                >Reciprocal Rank Fusion</span
+                            >
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-block">
+                                <div class="stat-label">Formula</div>
+                                <div class="stat-value">
+                                    <code>score += 1/(k + rank)</code> per
+                                    channel, <code>RRF_K=60</code>
+                                </div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-label">Input</div>
+                                <div class="stat-value">
+                                    Union of two rankings — up to
+                                    <code>40</code> unique candidates (dense
+                                    &cup; sparse)
+                                </div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-label">Why RRF</div>
+                                <div class="stat-value">
+                                    Parameter-free fusion — no weight training
+                                    needed. Dense captures semantics, sparse
+                                    captures exact terms. RRF is robust to
+                                    outlier scores
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-card" id="detail-rerank">
+                        <div class="card-header">
+                            <span class="card-icon">&#9670;</span>
+                            <span class="card-title">BGE-M3 Reranking</span>
+                            <span class="card-model"
+                                >BAAI/bge-reranker-v2-m3</span
+                            >
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-block">
+                                <div class="stat-label">Input</div>
+                                <div class="stat-value">
+                                    ~<code>40</code> RRF-fused candidates, each
+                                    (query, passage) pair scored by the reranker
+                                </div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-label">Output</div>
+                                <div class="stat-value">
+                                    Top-ranked passages passed to the LLM for
+                                    generation
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-card" id="detail-generate">
+                        <div class="card-header">
+                            <span class="card-icon">&#9881;</span>
+                            <span class="card-title"
+                                >Generator &amp; Agent</span
+                            >
+                            <span class="card-model"
+                                >Qwen 3.6 27B (IQ4_XS)</span
+                            >
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-block">
+                                <div class="stat-label">Single-shot</div>
+                                <div class="stat-value">
+                                    Top passages + query &rarr; LLM answer with
+                                    <code>[n]</code> citations. Refuses to
+                                    answer when evidence is insufficient
+                                </div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-label">Agent (multi-hop)</div>
+                                <div class="stat-value">
+                                    Up to <code>8</code> steps. Tools:
+                                    <code>search_law</code>,
+                                    <code>search_client_docs</code>,
+                                    <code>extract</code>,
+                                    <code>resolve_matter</code>
+                                </div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-label">Guardrails</div>
+                                <div class="stat-value">
+                                    <code>[DOPLNIT: &hellip;]</code> markers for
+                                    missing facts, citations must resolve to
+                                    real passages
+                                </div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-label">Inference</div>
+                                <div class="stat-value">
+                                    RTX 4000 Blackwell, llama-server, 4-bit
+                                    quantization. Fallback: remote inference
+                                    endpoint
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-card" id="detail-output">
+                        <div class="card-header">
+                            <span class="card-icon">&#9745;</span>
+                            <span class="card-title">Output</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-block">
+                                <div class="stat-label">Answer</div>
+                                <div class="stat-value">
+                                    Legal analysis in Czech with numbered
+                                    citations <code>[1]</code>,
+                                    <code>[2]</code>&hellip; Each resolves to a
+                                    specific statute § or client document chunk
+                                </div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-label">Draft</div>
+                                <div class="stat-value">
+                                    Legal document (demand letter, contract,
+                                    notice&hellip;).
+                                </div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-label">Delivery</div>
+                                <div class="stat-value">
+                                    WebSocket streaming token-by-token
+                                    (<code>/ws/ask</code>)
+                                </div>
+                            </div>
+                            <div class="stat-block">
+                                <div class="stat-label">
+                                    Citations in the app
+                                </div>
+                                <div class="stat-value">
+                                    <div
+                                        class="card-screenshot"
+                                        onclick="openLightbox(6)"
+                                    >
+                                        <img
+                                            src="screenshots/citations_crop.png"
+                                            alt="Cited references in Casely"
+                                        />
+                                        <div class="ss-label">
+                                            Hoverable references — click to zoom
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 5: LLM choice -->
+            <div class="slide">
+                <h2>LLM Choice</h2>
+                <div class="section-sub">
+                    Language and factual errors across all 6 generations per
+                    model.
+                </div>
+                <div class="verdict-row">
+                    <div class="verdict-box bad">
+                        <div class="model-name">Gemma 4 12B (Q4_K_M)</div>
+                        <div class="model-desc">
+                            Google, 12B parameters, instruction-tuned. Q4_K_M
+                            quantization (4-bit, medium quality — groups weights
+                            with per-group scaling factors).
+                        </div>
+                        <div class="big-number">14</div>
+                        <div class="unit">
+                            errors — invented words, wrong gender, wrong
+                            numbers, corrupted forms
+                        </div>
+                    </div>
+                    <div class="verdict-box good">
+                        <div class="model-name">Qwen 3.6 27B (IQ4_XS)</div>
+                        <div class="model-desc">
+                            Alibaba Qwen team, 27B parameters, instruction-tuned
+                            with multi-token prediction. IQ4_XS quantization
+                            (importance-matrix 4-bit — allocates bits based on
+                            weight significance, more compact).
+                        </div>
+                        <div class="big-number">0</div>
+                        <div class="unit">
+                            errors — grammatically correct, professional Czech
+                        </div>
+                    </div>
+                </div>
+                <div class="verdict-mention">
+                    <div class="model-name">Apertus 70B</div>
+                    <div class="model-desc">
+                        70B parameters — too large to host locally on a single
+                        RTX 4000 Blackwell (24 GB VRAM). Available via Public AI
+                        as a remote inference endpoint for end-users who need
+                        on-demand access without dedicated hardware.
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 6: Demand letter -->
+            <div class="slide">
+                <h2>1. Demand Letter</h2>
+                <div class="section-sub">
+                    Tenant dispute — tenant replaced apartment doors without
+                    consent. Gemma: 5 errors. Qwen: 0.
+                </div>
+                <div class="comparison-grid">
+                    <div class="comparison-panel bad">
+                        <div class="panel-tag">Gemma 4 · 5 errors</div>
+                        <div class="specimen">
+                            <mark>Předpísné:</mark>
+                            <span class="ann">← invented word</span> Paní
+                            [Jméno] <mark>Lakátošová</mark> <br /><br />
+                            V zastoupení paní Zikmundové,
+                            <mark>vlastníčky</mark> bytu
+                            <span class="ann"
+                                >← non-existent form (correct: vlastnice)</span
+                            >
+                            <br /><br />
+                            …jste v rámci nájmu <mark>provedli</mark> zásah do
+                            konstrukce bytu
+                            <span class="ann"
+                                >← wrong gender (correct: provedla)</span
+                            >
+                            <br /><br />
+                            …jste výslovně <mark>povinny</mark> byt odevzdat
+                            <span class="ann"
+                                >← wrong number (correct: povinna)</span
+                            >
+                            <br /><br />
+                            …včetně návrhu na výpověď nájemní smlouvy
+                            <mark>ažal</mark> v důsledku
+                            <span class="ann">← invented word</span>
+                        </div>
+                    </div>
+                    <div class="comparison-panel good">
+                        <div class="panel-tag">Qwen 3.6 · 0 errors</div>
+                        <div class="specimen">
+                            Věc: Výzva k nápravě porušení povinností z nájemní
+                            smlouvy a k úhradě dlužného nájemného Vážená paní
+                            Lakátošová, tímto Vás, v zastoupení paní Zikmundové,
+                            vlastníčky bytu nacházejícího se v Turnově, formálně
+                            vyzývám k nápravě porušení povinností vyplývajících
+                            z uzavřené nájemní smlouvy. Zjištěním bylo, že jste
+                            bez předchozího písemného souhlasu pronajímatele
+                            provedla výměnu vchodových dveří do bytu.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 7: Settlement -->
+            <div class="slide">
+                <h2>2. Settlement Agreement</h2>
+                <div class="section-sub">
+                    Unpaid invoice of 150,000 CZK with installment plan. Gemma:
+                    5 errors. Qwen: 0.
+                </div>
+                <div class="comparison-grid">
+                    <div class="comparison-panel bad">
+                        <div class="panel-tag">Gemma 4 · 5 errors</div>
+                        <div class="specimen">
+                            <mark>usuzená</mark> v [Místo]
+                            <span class="ann"
+                                >← wrong word (correct: uzavřená)</span
+                            >
+                            <br /><br />
+                            …je vůči <mark>Věřitelilu</mark> v dluhu
+                            <span class="ann"
+                                >← corrupted form (correct: Věřiteli)</span
+                            >
+                            <br /><br />
+                            …v částce 150 000,- Kč (<mark
+                                >jednastyřicimtisíc</mark
+                            >
+                            korun)
+                            <span class="ann"
+                                >← says 41,000, text says 150,000</span
+                            >
+                            <br /><br />
+                            …stává okamžitě <mark>splatalným</mark> celý
+                            zbývající zůstatek
+                            <span class="ann"
+                                >← invented form (correct: splatným)</span
+                            >
+                            <br /><br />
+                            …prohlašují, že se s touto dohodou
+                            <mark>rozumí</mark> zcela
+                            <span class="ann"
+                                >← nonsensical (correct: vypořádávají)</span
+                            >
+                        </div>
+                    </div>
+                    <div class="comparison-panel good">
+                        <div class="panel-tag">Qwen 3.6 · 0 errors</div>
+                        <div class="specimen">
+                            DOHODA O NAROVNÁNÍ uzavřená níže uvedeného dne,
+                            měsíce a roku na základě ustanovení § 2579 a násl.
+                            zákona č. 89/2012 Sb., občanský zákoník …je vůči
+                            Věřiteli v dluhu v částce 150 000,- Kč (slovy: sto
+                            padesát tisíc korun českých) …stává se okamžitě
+                            splatným celý zbývající zůstatek dluhu
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 8: Lease termination -->
+            <div class="slide">
+                <h2>3. Lease Termination Notice</h2>
+                <div class="section-sub">
+                    Repeated non-payment of rent, 3 months in arrears. Gemma: 4
+                    errors. Qwen: 0.
+                </div>
+                <div class="comparison-grid">
+                    <div class="comparison-panel bad">
+                        <div class="panel-tag">Gemma 4 · 4 errors</div>
+                        <div class="specimen">
+                            <mark>VÝPĚVEĎ</mark> NÁJMU NEMOVITOSTI
+                            <span class="ann"
+                                >← misspelling (correct: VÝPOVĚĎ)</span
+                            >
+                            <br /><br />
+                            Tímto Vás, paní Svobodová,
+                            <mark>vyřkuji</mark> nájemní smlouvy
+                            <span class="ann"
+                                >← invented verb (correct: vypovídám)</span
+                            >
+                            <br /><br />
+                            …za tři měsíce, což činí celkovou částku
+                            <mark>45 000,- Kč</mark>
+                            <br /><br />
+                            …je nájemkyně povinna nemovitost
+                            <mark>opustit</mark> a předat
+                            <mark>pronajímateli</mark>
+                            <span class="ann"
+                                >← wrong tense for female subject</span
+                            >
+                        </div>
+                    </div>
+                    <div class="comparison-panel good">
+                        <div class="panel-tag">Qwen 3.6 · 0 errors</div>
+                        <div class="specimen">
+                            Výpověď nájmu bytu Věc: Výpověď nájmu bytu na adrese
+                            Husova 12, Praha 1 tímto Vás tímto písemným sdělením
+                            informuji, že Vám jako pronajímatel vypovídám
+                            nájemní smlouvu …neuhrazenou pohledávku za nájemné
+                            ve výši 45 000,- Kč (slovy: čtyřicet pět tisíc korun
+                            českých)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 9: Error catalog -->
+            <div class="slide">
+                <h2>Gemma 4 Error Catalog</h2>
+                <div class="section-sub">
+                    All 10 unique errors from 6 generations. 4 invented words, 2
+                    corrupted forms, 2 grammar, 2 factual.
+                </div>
+                <div class="error-table-wrap">
+                    <table class="error-catalog">
+                        <thead>
+                            <tr>
+                                <th>Error</th>
+                                <th>Correct</th>
+                                <th>Type</th>
+                                <th>Document</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="err">Předpísné</span></td>
+                                <td><span class="fix">Adresát</span></td>
+                                <td><span class="type-tag">invented</span></td>
+                                <td>Demand</td>
+                            </tr>
+                            <tr>
+                                <td><span class="err">ažal</span></td>
+                                <td><span class="fix">a to / jakož i</span></td>
+                                <td><span class="type-tag">invented</span></td>
+                                <td>Demand</td>
+                            </tr>
+                            <tr>
+                                <td><span class="err">vyřkuji</span></td>
+                                <td><span class="fix">vypovídám</span></td>
+                                <td><span class="type-tag">invented</span></td>
+                                <td>Notice</td>
+                            </tr>
+                            <tr>
+                                <td><span class="err">splatalným</span></td>
+                                <td><span class="fix">splatným</span></td>
+                                <td><span class="type-tag">invented</span></td>
+                                <td>Settlement</td>
+                            </tr>
+                            <tr>
+                                <td><span class="err">VÝPĚVEĎ</span></td>
+                                <td><span class="fix">VÝPOVĚĎ</span></td>
+                                <td><span class="type-tag">spelling</span></td>
+                                <td>Notice</td>
+                            </tr>
+                            <tr>
+                                <td><span class="err">Věřitelilu</span></td>
+                                <td><span class="fix">Věřiteli</span></td>
+                                <td><span class="type-tag">corrupted</span></td>
+                                <td>Settlement</td>
+                            </tr>
+                            <tr>
+                                <td><span class="err">usuzená</span></td>
+                                <td><span class="fix">uzavřená</span></td>
+                                <td>
+                                    <span class="type-tag">wrong word</span>
+                                </td>
+                                <td>Settlement</td>
+                            </tr>
+                            <tr>
+                                <td><span class="err">provedli</span></td>
+                                <td><span class="fix">provedla</span></td>
+                                <td>
+                                    <span class="type-tag">wrong gender</span>
+                                </td>
+                                <td>Demand</td>
+                            </tr>
+                            <tr>
+                                <td><span class="err">povinny</span></td>
+                                <td><span class="fix">povinna</span></td>
+                                <td>
+                                    <span class="type-tag">wrong number</span>
+                                </td>
+                                <td>Demand</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="err">jednastyřicimtisíc</span>
+                                </td>
+                                <td>
+                                    <span class="fix">sto padesát tisíc</span>
+                                </td>
+                                <td>
+                                    <span class="type-tag">wrong amount</span>
+                                </td>
+                                <td>Settlement</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SLIDE 10: Conclusion -->
+            <div class="slide conclusion-slide">
+                <h2>Conclusion</h2>
+                <div class="takeaway">
+                    Gemma 4 12B invents non-existent words, confuses gender and
+                    number, occasionally states wrong amounts.
+                    <strong>Qwen 3.6 27B has none of these problems</strong>
+                </div>
+                <div class="conclusion-summary">
+                    <div class="conclusion-stat">
+                        <div class="num red">14 → 0</div>
+                        <div class="desc">errors after switching to Qwen</div>
+                    </div>
+                    <div class="conclusion-stat">
+                        <div class="num green">2.5×</div>
+                        <div class="desc">
+                            faster generation (MTP and lower quantization)
+                        </div>
+                    </div>
+                    <div class="conclusion-stat">
+                        <div class="num green">27B</div>
+                        <div class="desc">parameters, still 4-bit on 24 GB</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lightbox" id="lightbox">
+            <div class="lightbox-inner">
+                <button class="lightbox-close" onclick="closeLightbox()">
+                    ESC &times;
+                </button>
+                <button class="lightbox-nav prev" onclick="lbNav(-1)">
+                    &#8249;
+                </button>
+                <button class="lightbox-nav next" onclick="lbNav(1)">
+                    &#8250;
+                </button>
+                <div class="lightbox-viewport" id="lbViewport">
+                    <img id="lbImg" src="" alt="" class="fit" />
+                </div>
+                <div class="lightbox-bottom">
+                    <div class="lightbox-caption" id="lbCap"></div>
+                    <div class="zoom-controls">
+                        <button
+                            class="zoom-btn"
+                            onclick="zoomBy(-1)"
+                            title="Zoom out"
+                        >
+                            &minus;
+                        </button>
+                        <span class="zoom-level" id="zoomLevel">Fit</span>
+                        <button
+                            class="zoom-btn"
+                            onclick="zoomBy(1)"
+                            title="Zoom in"
+                        >
+                            &plus;
+                        </button>
+                        <button
+                            class="zoom-btn fit-btn"
+                            onclick="zoomFit()"
+                            title="Fit to screen"
+                        >
+                            FIT
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            var slides = document.querySelectorAll(".slide");
+            var total = slides.length;
+            var current = 0;
+            var lbOpen = false;
+
+            var lbImages = [
+                {
+                    src: "screenshots/live_01_matters.png",
+                    cap: "Matters overview",
+                },
+                { src: "screenshots/live_04_prompt.png", cap: "User prompt" },
+                {
+                    src: "screenshots/live_06_response.png",
+                    cap: "Model response",
+                },
+                {
+                    src: "screenshots/live_09_response_summary.png",
+                    cap: "Response summary",
+                },
+                {
+                    src: "screenshots/live_10_draft_document.png",
+                    cap: "Generated document",
+                },
+                {
+                    src: "screenshots/live_12_draft_bottom.png",
+                    cap: "Document footer",
+                },
+                {
+                    src: "screenshots/citations_crop.png",
+                    cap: "Hoverable citation references",
+                },
+            ];
+            var lbIndex = 0;
+
+            // Architecture detail cards
+            var activeNode = null;
+            function showDetail(key) {
+                var cards = document.querySelectorAll(".detail-card");
+                var nodes = document.querySelectorAll(".flow-node");
+                var hint = document.getElementById("detailHint");
+
+                if (activeNode === key) {
+                    // toggle off
+                    cards.forEach(function (c) {
+                        c.classList.remove("visible");
+                    });
+                    nodes.forEach(function (n) {
+                        n.classList.remove("active");
+                    });
+                    if (hint) hint.style.display = "";
+                    activeNode = null;
+                    return;
+                }
+
+                activeNode = key;
+                cards.forEach(function (c) {
+                    c.classList.remove("visible");
+                });
+                nodes.forEach(function (n) {
+                    n.classList.remove("active");
+                });
+                if (hint) hint.style.display = "none";
+
+                var card = document.getElementById("detail-" + key);
+                if (card) card.classList.add("visible");
+
+                var node = document.querySelector('[data-node="' + key + '"]');
+                if (node) node.classList.add("active");
+            }
+
+            var zoomSteps = [0.25, 0.5, 0.75, 1, 1.5, 2, 3];
+            var zoomIdx = -1; // -1 = fit mode
+            var lbNatW = 0;
+            var lbNatH = 0;
+
+            var lbImg = document.getElementById("lbImg");
+            var lbViewport = document.getElementById("lbViewport");
+
+            function show(i) {
+                slides.forEach(function (s) {
+                    s.classList.remove("active");
+                });
+                slides[i].classList.add("active");
+                document.getElementById("slideNum").textContent =
+                    i + 1 + " / " + total;
+                document.getElementById("progress").style.width =
+                    ((i + 1) / total) * 100 + "%";
+                if (i > 0)
+                    document.getElementById("navHint").classList.add("faded");
+                // reset architecture detail cards when leaving that slide
+                if (activeNode !== null) {
+                    document
+                        .querySelectorAll(".detail-card")
+                        .forEach(function (c) {
+                            c.classList.remove("visible");
+                        });
+                    document
+                        .querySelectorAll(".flow-node")
+                        .forEach(function (n) {
+                            n.classList.remove("active");
+                        });
+                    var hint = document.getElementById("detailHint");
+                    if (hint) hint.style.display = "";
+                    activeNode = null;
+                }
+            }
+
+            function go(delta) {
+                if (lbOpen) return;
+                var next = current + delta;
+                if (next >= 0 && next < total) {
+                    current = next;
+                    show(current);
+                }
+            }
+
+            function updateZoomLabel() {
+                var el = document.getElementById("zoomLevel");
+                if (zoomIdx < 0) {
+                    el.textContent = "Fit";
+                } else {
+                    el.textContent = Math.round(zoomSteps[zoomIdx] * 100) + "%";
+                }
+            }
+
+            function applyZoom() {
+                if (zoomIdx < 0) {
+                    lbImg.classList.add("fit");
+                    lbImg.style.width = "";
+                    lbImg.style.height = "";
+                } else {
+                    lbImg.classList.remove("fit");
+                    var scale = zoomSteps[zoomIdx];
+                    lbImg.style.width = Math.round(lbNatW * scale) + "px";
+                    lbImg.style.height = Math.round(lbNatH * scale) + "px";
+                }
+                updateZoomLabel();
+            }
+
+            function zoomBy(dir) {
+                if (!lbOpen) return;
+                if (zoomIdx < 0) {
+                    // leaving fit mode: pick the step closest to current visual size
+                    var visW = lbImg.offsetWidth;
+                    var ratio = lbNatW > 0 ? visW / lbNatW : 1;
+                    var best = 0;
+                    for (var i = 0; i < zoomSteps.length; i++) {
+                        if (
+                            Math.abs(zoomSteps[i] - ratio) <
+                            Math.abs(zoomSteps[best] - ratio)
+                        )
+                            best = i;
+                    }
+                    zoomIdx = best + dir;
+                } else {
+                    zoomIdx += dir;
+                }
+                if (zoomIdx < 0) zoomIdx = 0;
+                if (zoomIdx >= zoomSteps.length) zoomIdx = zoomSteps.length - 1;
+                applyZoom();
+            }
+
+            function zoomFit() {
+                zoomIdx = -1;
+                applyZoom();
+                lbViewport.scrollTop = 0;
+                lbViewport.scrollLeft = 0;
+            }
+
+            function openLightbox(idx) {
+                lbIndex = idx;
+                lbOpen = true;
+                zoomIdx = -1;
+
+                lbImg.classList.add("fit");
+                lbImg.style.width = "";
+                lbImg.style.height = "";
+                lbImg.src = lbImages[idx].src;
+
+                document.getElementById("lbCap").textContent =
+                    lbImages[idx].cap +
+                    "  (" +
+                    (idx + 1) +
+                    "/" +
+                    lbImages.length +
+                    ")";
+                updateZoomLabel();
+                document.getElementById("lightbox").classList.add("open");
+
+                // get natural dimensions once loaded
+                if (lbImg.naturalWidth) {
+                    lbNatW = lbImg.naturalWidth;
+                    lbNatH = lbImg.naturalHeight;
+                } else {
+                    lbImg.onload = function () {
+                        lbNatW = lbImg.naturalWidth;
+                        lbNatH = lbImg.naturalHeight;
+                    };
+                }
+            }
+
+            function closeLightbox() {
+                lbOpen = false;
+                zoomIdx = -1;
+                document.getElementById("lightbox").classList.remove("open");
+            }
+
+            function lbNav(delta) {
+                var next = lbIndex + delta;
+                if (next >= 0 && next < lbImages.length) {
+                    openLightbox(next);
+                }
+            }
+
+            // close on backdrop click
+            document
+                .getElementById("lightbox")
+                .addEventListener("click", function (e) {
+                    if (e.target === this) closeLightbox();
+                });
+
+            // mouse-wheel zoom inside lightbox viewport
+            lbViewport.addEventListener(
+                "wheel",
+                function (e) {
+                    if (!lbOpen) return;
+                    e.preventDefault();
+                    zoomBy(e.deltaY < 0 ? 1 : -1);
+                },
+                { passive: false },
+            );
+
+            // drag to pan when zoomed
+            (function () {
+                var dragging = false,
+                    startX,
+                    startY,
+                    scrollL,
+                    scrollT;
+                lbViewport.addEventListener("mousedown", function (e) {
+                    if (zoomIdx < 0) return;
+                    dragging = true;
+                    lbViewport.classList.add("dragging");
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    scrollL = lbViewport.scrollLeft;
+                    scrollT = lbViewport.scrollTop;
+                    e.preventDefault();
+                });
+                document.addEventListener("mousemove", function (e) {
+                    if (!dragging) return;
+                    lbViewport.scrollLeft = scrollL - (e.clientX - startX);
+                    lbViewport.scrollTop = scrollT - (e.clientY - startY);
+                });
+                document.addEventListener("mouseup", function () {
+                    dragging = false;
+                    lbViewport.classList.remove("dragging");
+                });
+            })();
+
+            // double-click to toggle fit / 100%
+            lbImg.addEventListener("dblclick", function () {
+                if (zoomIdx < 0) {
+                    zoomIdx = zoomSteps.indexOf(1);
+                    if (zoomIdx < 0) zoomIdx = 3;
+                    applyZoom();
+                } else {
+                    zoomFit();
+                }
+            });
+
+            document.addEventListener("keydown", function (e) {
+                if (lbOpen) {
+                    if (e.key === "Escape") {
+                        closeLightbox();
+                        return;
+                    }
+                    if (e.key === "ArrowRight") {
+                        e.preventDefault();
+                        lbNav(1);
+                        return;
+                    }
+                    if (e.key === "ArrowLeft") {
+                        e.preventDefault();
+                        lbNav(-1);
+                        return;
+                    }
+                    if (e.key === "+" || e.key === "=") {
+                        e.preventDefault();
+                        zoomBy(1);
+                        return;
+                    }
+                    if (e.key === "-") {
+                        e.preventDefault();
+                        zoomBy(-1);
+                        return;
+                    }
+                    if (e.key === "0") {
+                        e.preventDefault();
+                        zoomFit();
+                        return;
+                    }
+                    return;
+                }
+                if (
+                    e.key === "ArrowRight" ||
+                    e.key === " " ||
+                    e.key === "PageDown"
+                ) {
+                    e.preventDefault();
+                    go(1);
+                } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+                    e.preventDefault();
+                    go(-1);
+                } else if (e.key === "Home") {
+                    e.preventDefault();
+                    current = 0;
+                    show(current);
+                } else if (e.key === "End") {
+                    e.preventDefault();
+                    current = total - 1;
+                    show(current);
+                }
+            });
+
+            var touchStartX = 0;
+            document.addEventListener(
+                "touchstart",
+                function (e) {
+                    touchStartX = e.touches[0].clientX;
+                },
+                { passive: true },
+            );
+            document.addEventListener(
+                "touchend",
+                function (e) {
+                    var dx = e.changedTouches[0].clientX - touchStartX;
+                    if (lbOpen) {
+                        if (Math.abs(dx) > 50) lbNav(dx < 0 ? 1 : -1);
+                    } else {
+                        if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
+                    }
+                },
+                { passive: true },
+            );
+
+            show(0);
+        </script>
+    </body>
+</html>

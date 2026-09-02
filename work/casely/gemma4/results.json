@@ -1,0 +1,112 @@
+[
+  {
+    "model": "gemma-4-12B-it (Q4_K_M)",
+    "prompt_id": "demand_letter",
+    "prompt_title": "Demand letter — tenant dispute (the original complaint)",
+    "run": 1,
+    "text": "[Jméno a příjmení zástupce]\n[Adresa zástupce]\n[Kontaktní údaje]\n\nVážená paní Lakátošová,\n[Adresa nájemnice]\n\n**Výzva k nápravě porušení nájemní smlouvy a výzva k úhradě dlužného nájemného**\n\nV zastoupení paní Zikmundové, vlastníčky bytu v Turnově, Vás tímto dopisem vyzývám k nápravě porušení závazků vyplývajících z uzavřené nájemní smlouvy.\n\nZjištěno bylo, že jste",
+    "elapsed_s": 33.2,
+    "tokens": {
+      "completion_tokens": 2048,
+      "prompt_tokens": 233,
+      "total_tokens": 2281,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "canary_hits": [],
+    "timestamp": "2026-08-31T15:33:35"
+  },
+  {
+    "model": "gemma-4-12B-it (Q4_K_M)",
+    "prompt_id": "demand_letter",
+    "prompt_title": "Demand letter — tenant dispute (the original complaint)",
+    "run": 2,
+    "text": "[Jméno a příjmení právníka/advokáta]\n[Adresa]\n[Kontaktní údaje]\n\nV Turnově, dne [Dnešní datum]\n\n**Předpísné:**\nPaní [Jméno] Lakátošová\n[Adresa nájemníka]\n[Poštovní směrnice]\n\n**Výzva k nápravě porušení nájemní smlouvy a výzva k úhradě dlužného nájemného**\n\nV zastoupení paní Zikmundové, vlastníčky bytu v Turnově, Vás tímto vyzývám k nápravě porušení závazků vyplývajících z uzavřené nájemní smlouvy.\n\nZjištěno bylo, že jste v rámci nájmu provedli zásah do konstrukce bytu, konkrétně jste bez předchozího souhlasu vlastníčky vyměnili vchodové dveře bytu. Podle ustanovení nájemní smlouvy jste výslovně povinny byt odevzdat v původním stavu, v jakém jste jej převzala. Tato změna je v rozporu s nájemní smlouvou a představuje porušení Vašich povinností.\n\nDále Vás vyzývám k úhradě dlužného nájemného, které k dnešnímu dni činí celkovou částku 36 000,- Kč.\n\nNa základě výše uvedeného Vás vyzývám k provedení následujících kroků do lhůty 14 dnů od doručení tohoto dopisu:\n\n1.  **Náprava stavu:** Odstranění nainstalovaných dveří a vrácení vchodových dveří do původního stavu, v jakém byly před Vaším převzetím.\n2.  **Úhrada dlužného:** Úhradu dlužného nájemného ve výši 36 000,- Kč na účet číslo: **1307257032/3030**.\n\nPokud neprovedete výše uvedené nápravy a úhradu dlužného v stanovené lhůtě, bude klientka nucena podniknout právní kroky, včetně návrhu na výpověď nájemní smlouvy ažal v důsledku porušení závazků, a to včetně nároků na náhradu škody a nákladů na právní zajištění.\n\nS pozdravem,\n\n[Podpis právníka]\n\nV Turnově, dne 31. 8. 2026.",
+    "elapsed_s": 24.4,
+    "tokens": {
+      "completion_tokens": 1529,
+      "prompt_tokens": 233,
+      "total_tokens": 1762,
+      "prompt_tokens_details": {
+        "cached_tokens": 228
+      }
+    },
+    "canary_hits": [
+      "V Turnov"
+    ],
+    "timestamp": "2026-08-31T15:33:59"
+  },
+  {
+    "model": "gemma-4-12B-it (Q4_K_M)",
+    "prompt_id": "settlement",
+    "prompt_title": "Settlement agreement — unpaid invoice",
+    "run": 1,
+    "text": "**DOHODA O NAROVNÁNÍ DLUHU**\n\nMezi společnost **ABC s.r.o.**, IČO 12345678, se sídlem [Zadat adresu], zastoupenou [Zadat osoby], dále jen „Věřitel“, a **panem Novákem**, narozeným 15. 3. 1985, s trvalým bydlištěm [Zadat adresu], dále jen „Dlužník“, se uzavřela dohoda o narovnání dluhu (dále jen „Dohoda“) podle následujících umluv:\n\n**Čl. I**\n**Předmět dohody a uznání dluhu**\n\n1. Dlužník tímto výslovně uznává, že je vůči Věřiteli povinen zaplatit částku 150 000,- Kč (jednastyřicet tisíc korun českých) za nezaplacenou fakturu č. 2026-0042.\n2. Věřitel potvrzuje, že uvedená částka je v současné době neuhrazená a Dlužník se zavazuje tuto částku uhradit dle podmínek stanovených v této Dohodě.\n\n**Čl. II**\n**Splátkový kalendář**\n\n1. Dlužník se zavazuje výše zmíněnou částku uhradit Věřiteli v třech (3) splátkách, z nichž každá činí 50 000,- Kč (padesát tisíc korun českých).\n2. Splátky budou splatné v následujících termínech:\n    a) 50 000,- Kč do 15. 9. 2026,\n    b) 50 000,- Kč do 15. 10. 2026,\n    c) 50 000,- Kč do 15. 11. 2026.\n3. Platba splátek bude prováděna na bankovní účet Věřitele uvedený v této Dohodě nebo na účet, který Věřitel Dlužníkovi v písemné formě oznámí.\n\n**Čl. III**\n**Prodlení a okamžitá splatnost**\n\n1. V případě prodlení Dlužníka s jakoukoli z výše uvedených splátek se celý zbývající nesplacený zůstatek dluhu stává okamžitě splatelným v celku bez dalšího upozornění.\n2. V případě prodlení Dlužníka je Věřitel oprávněn podat žalobu na vymáhání dluhu a Dlužník se zavazuje uhradit Věřiteli veškeré náklady spojené s vymáháním, včetně soudních poplatků a nákladů na právní pomoc.\n\n**Čl. IV**\n**Řádící právo**\n\n1. Tato Dohoda se řídí českým právem.\n",
+    "elapsed_s": 33.4,
+    "tokens": {
+      "completion_tokens": 2048,
+      "prompt_tokens": 230,
+      "total_tokens": 2278,
+      "prompt_tokens_details": {
+        "cached_tokens": 40
+      }
+    },
+    "canary_hits": [],
+    "timestamp": "2026-08-31T15:34:33"
+  },
+  {
+    "model": "gemma-4-12B-it (Q4_K_M)",
+    "prompt_id": "settlement",
+    "prompt_title": "Settlement agreement — unpaid invoice",
+    "run": 2,
+    "text": "**DOHODA O NAROVNÁNÍ DLUHU**\n\nusuzená v [Místo], dne [Datum]\n\n**Smluvní strany:**\n\n1. **ABC s.r.o.**, společnost s omezenou odpovědností, IČO: 12345678, se sídlem [ulice, číslo, PSČ, město], zastoupená [jméno osoby oprávněné k jednání], dále jen „Věřitel“,\n\na\n\n2. **Pan Novák**, narozen dne 15. 3. 1985, s trvalým bydlištěm [ulice, číslo, PSČ, město], dále jen „Dlužník“.\n\nSmluvní strany se dohodly následujícího:\n\n**Čl. I**\n**Předmět dohody**\n\n1. Dlužník tímto výslovně uznává, že je vůči Věřitelilu v dluhu v částce 150 000,- Kč (jednastyřicimtisíc korun českých) za nezaplacenou fakturu č. 2026-0042.\n2. Smluvní strany se dohodují na narovnání výše uvedeného dluhu prostřednictvím splátkového kalendáře dle podmínek stanovených v této dohodě.\n\n**Čl. II**\n**Splátkový kalendář**\n\n1. Dlužník se zavazuje zaplatit celkovou částku dluhu v částce 150 000,- Kč ve třech (3) rovnocenných splátkách, z nichž každá činí 50 000,- Kč (padesattisíc korun českých).\n2. Splátky budou splatné v následujících termínech:\n   a) první splátka v částce 50 000,- Kč do dne 15. 9. 2026,\n   b) druhá splátka v částce 50 000,- Kč do dne 15. 10. 2026,\n   c) třetí splátka v částce 50 000,- Kč do dne 15. 11. 2026.\n3. Platba splátek bude prováděna na bankovní účet Věřitele uvedený v této dohodě nebo na účet uvedený na příslušné faktuře.\n\n**Čl. III**\n**Prodlení a okamžitá splatnost**\n\n1. V případě prodlení Dlužníka s jakoukoli splátkou dle Čl. II této dohody se stává okamžitě splatelným celý zbývající zůstatek dluhu.\n2. V případě výše uvedeného prodlení má Věřitel právo vymáhat celkový zůstatek dluhu bez ohledu na stanovený splátkový kalendář, a to včetně úroku z prodlení stanoveného zákonem.\n\n**Čl. IV**\n**Závěrečná ustanovení**\n\n1. Tato dohoda se řídí právním řádem České republiky.\n2. Smluvní strany prohlašují, že se s touto dohodou rozumí zcela a definitivně v závislosti na plnění všech závazků vyplývajících z této dohody.\n3. Tato dohoda je vyhotovena ve dvou stejnopisných vyhotoveních, po jednom pro každou ze smluvních stran.\n\n**Smluvní strany:**\n\n__________________________\n**ABC s.r.o.**\n(Věřitel)\n\n__________________________\n**Pan Novák**\n(Dlužník)",
+    "elapsed_s": 29.6,
+    "tokens": {
+      "completion_tokens": 1808,
+      "prompt_tokens": 230,
+      "total_tokens": 2038,
+      "prompt_tokens_details": {
+        "cached_tokens": 225
+      }
+    },
+    "canary_hits": [],
+    "timestamp": "2026-08-31T15:35:02"
+  },
+  {
+    "model": "gemma-4-12B-it (Q4_K_M)",
+    "prompt_id": "notice",
+    "prompt_title": "Lease termination notice",
+    "run": 1,
+    "text": "[Jméno a adresa pronajímatele]\n\n[Jméno a adresa nájemkyně]\n\n**VÝPĚVEĎ NÁJMU NEMOVITOSTI**\n\nTímto Vás, paní Svobodová, vyřkuji nájemní smlouvy o nájmu bytu nacházejícího se na adrese Husova 12, Praha 1.\n\nDůvodem této výpovědi je hrubé porušení povinností vyplývajících z nájemní smlouvy, konkrétně opakované neplnění povinnosti zaplatit nájemné. K aktuálnímu dni je nájemkyně zadlužena za tři měsíce, což činí celkovou částku 45 000,- Kč.\n\nVýpovědní doba činí 3 měsíce, v souladu s ustanovením § 2288 občanského zákoníku. Nájemní smlouva skončí s uplynutím této lhůty.\n\nS tímto dopisem Vás zároveň vyzývám k okamžitému uhradění celkové dlužné částky ve výši 45 000,- Kč na účet pronajímatele. Po uplynutí výpovědní doby je nájemkyně povinna nemovitost opustit a předat pronajímateli v původním stavu.\n\nV Praze, dne 31. 8. 2026.\n\n__________________________\n[Podpis pronajímatele]\nPan Dvořák",
+    "elapsed_s": 22.8,
+    "tokens": {
+      "completion_tokens": 1392,
+      "prompt_tokens": 210,
+      "total_tokens": 1602,
+      "prompt_tokens_details": {
+        "cached_tokens": 40
+      }
+    },
+    "canary_hits": [],
+    "timestamp": "2026-08-31T15:35:25"
+  },
+  {
+    "model": "gemma-4-12B-it (Q4_K_M)",
+    "prompt_id": "notice",
+    "prompt_title": "Lease termination notice",
+    "run": 2,
+    "text": "**VÝPOVĚď Z NÁJMU BYTU**\n\nV Praze, dne 31. 8. 2026\n\n**Pronajímatel:**\nPan Dvořák\n[Zde uveďte adresu pronajímatele]\n\n**Nájemkyně:**\nPaní Svobodová\nHusova 12, Praha 1\n\n**Předmět výpovědi:**\nNájem bytu nacházejícího se na adrese Husova 12, Praha 1.\n\n**Obsah výpovědi:**\nTímto písemným oznámením Vám výpověď z nájmu výše uvedeného bytu.\n\n**Odůvodnění:**\nVýpověď je dána z důvodu hrubého porušení povinností vyplývajících z nájemníčky. Konkrétně dochází k opakovanému neplnění povinnosti zaplatit nájemné. K aktuálnímu termínu je nájemkyně zadlužena s částkou 45 000,- Kč za tři měsíce.\n\n**Výpovědní lhůta:**\nVýpovědní lhůta činí tři měsíce, v souladu s ustanovením § 2288 občanského zákoníku. Nájemníčkou je tedy povinna byt opustit a předat pronajímateli nejpozději v termínu uplynutí výše uvedené lhůty.\n\nS pozdravem,\n\n__________________________\n(Podpis pronajímatele)\nPan Dvořák",
+    "elapsed_s": 24.4,
+    "tokens": {
+      "completion_tokens": 1485,
+      "prompt_tokens": 210,
+      "total_tokens": 1695,
+      "prompt_tokens_details": {
+        "cached_tokens": 205
+      }
+    },
+    "canary_hits": [],
+    "timestamp": "2026-08-31T15:35:49"
+  }
+]
